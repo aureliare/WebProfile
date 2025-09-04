@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Halaman Tidak Ditemukan</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+        h1 {
+            font-size: 6rem;
+            margin: 0;
+            color: #ff4757;
+        }
+        p {
+            font-size: 1.5rem;
+            margin: 20px 0;
+        }
+        a {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            color: #fff;
+            background-color: #007bff;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        a:hover {
+            background-color: #0056b3;
+        }
+        .image-container {
+            margin-top: 30px;
+        }
+        img {
+            width: 300px;  /* Atur ukuran gambar */
+        }
+    </style>
+</head>
+<body>
+    <h1>404</h1>
+    <p>Maaf, halaman yang Anda cari tidak ditemukan.</p>
+    <a href="{% url 'login' %}">Kembali ke Beranda</a>  <!-- Ganti 'home' dengan nama URL yang sesuai -->
+    <div class="image-container">
+    </div>
+</body>
+</html>

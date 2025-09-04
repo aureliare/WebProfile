@@ -1,0 +1,562 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+{% endblock  %}
+
+
+{% block content %}
+  {% include "components/_navbar.html" %}
+  {% include "components/_main_sidebar_container.html" %}
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0"></h1>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-12">
+            <div class="small-box">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-info">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /.content -->
+     
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <section class="col-lg-12 connectedSortable">
+            <!-- Custom tabs (Charts with tabs)-->
+            <div class="card">
+              <div class="card-body">
+                <div class="tab-content p-0 text-center">
+                  <!-- Contoh penggunaan dalam template -->
+                  <h4>KEBUTUHAN DATA SPESIFIK KABUPATEN BEKASI LAYAK ANAK</h4>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="row">
+            <section class="col-lg-12 connectedSortable">
+                <div class="">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="tab-content p-0 text-center">
+                                <div class="text-left">
+                                    {% csrf_token %}
+                                    <input type="hidden" id="instansi" name="instansi" class="form-control" value="{{ request.user.instansi_id }}">
+                                    <input type="hidden" id="answer_id" name="answer_id" class="form-control">
+                                    <input type="hidden" id="question_instansi_id" name="question_instansi_id" class="form-control">
+                                    <input type="hidden" id="question_id" name="question_id" class="form-control">
+                                    <div class="row text-center">
+                                        <div class="col-lg-6 col-md-4 d-col-none">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="tab-content p-0">
+                                                        <h5 class="card-title" id="time_over">Waktu Berakhir : {% if form %}{{ form.end|date:"d-m-Y" }} pukul {{ form.end|date:"H:i" }} WIB{% else %}{% endif %}</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-md-4 col-6 mb-3 d-none">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="tab-content p-0">
+                                                        <h5 class="card-title" id="em_value">Nilai EM = 0</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-md-4 col-6 mb-3 d-none">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="tab-content p-0">
+                                                        <h5 class="card-title" id="max_value">Nilai Maksimal = 0</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <h5 id="question_name"></h5>
+                                        <p>Jawaban:</p>
+                                        <div id="question_choice">
+                                        </div>
+
+                                        <p id="question_description">Catatan : </p>
+
+                                        {% comment %} <a href="#" id="matriks" target="_blank" title="Download Matriks">Download Matriks</a> {% endcomment %}
+                                        <div id="matriks-container">
+                                            <a href="#" target="_blank">Download</a>                                            
+                                        </div>
+                                                    
+                                        {% comment %} <input type="file" class="form-control" id="file_input" name="file_input" onchange="checkAndSave()"> {% endcomment %}
+
+                                        <button id="upload" class="form-control col-2">Upload</button>
+
+                                        <div id="file_answer"></div>
+                                        <div class="row mt-5">
+                                            <section class="col-lg-12 connectedSortable">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <div class="tab-content p-0 text-center">
+                                                            <p class="text-left">Penjelasan Data Pendukung :</p>
+                                                            <textarea class="form-control" rows="10" id="data_pendukung" name="data_pendukung" onchange="checkAndSave()"></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </section>
+                                        </div>
+
+                                        <div class="row">
+                                            <section class="col-lg-12 connectedSortable">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <div class="tab-content p-0 text-center">
+                                                            <p class="text-left"></p>
+                                                            <div class="form-check text-left">
+                                                                <input type="checkbox" class="form-check-input" id="dataBenar">
+                                                                <label class="form-check-label" for="dataBenar">Dengan ini, kami menyatakan bahwa data yang diinputkan adalah benar, akurat, dan dapat dipertanggungjawabkan. Kami bertanggung jawab atas kebenaran informasi tersebut dan bersedia memberikan klarifikasi jika diperlukan.</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </section>
+                                        </div>
+
+                                        <div class="row mt-5" id="koreksi-section">
+                                            <section class="col-lg-12 connectedSortable">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <div class="tab-content p-0 text-center">
+                                                            <p class="text-left">Koreksi :</p>
+                                                            <textarea class="form-control" rows="10" id="koreksi" name="koreksi" readonly></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </section>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-2 text-left p-0">
+                                            <button id="prev" class="btn btn-primary" onclick="fetchData(prevId)">BACK</button>
+                                        </div>
+                                        <div class="col-8">
+                                            <input type="hidden" id="current" name="current">
+                                        </div>
+                                        <div class="col-2 text-right p-0">
+                                            <button id="next" class="btn btn-primary" onclick="fetchData(nextId)" disabled>NEXT</button>
+                                        </div>
+                                    <div>                                                                         
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="col">
+                <div class="card-body">
+                    <div class="tab-content">
+                        <div class="text-right">
+                            <button id="save" class="btn btn-primary">Simpan</button>
+                            <input type="hidden" id="simpan" name="simpan" value="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!-- /.content-wrapper -->
+
+  <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Konfirmasi File {{ title }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah anda ingin menghapus data File {{ title }} ini?</p>
+                <input type="hidden" id="deleteId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">Hapus</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadModalLabel">Upload File {{ title }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="name">Nama</label>
+                    <input class="form-control" id="name" name="name" rows="4" required oninvalid="this.setCustomValidity('Silahkan isikan Nama')" oninput="this.setCustomValidity('')">
+                </div>
+                <div class="form-group">
+                    <label for="file_input">File</label>
+                    <input type="file" class="form-control" id="file_input" name="file_input">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
+                <button type="button" class="btn btn-danger" id="saveUpload" onclick="checkAndSave()">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<!-- Include SweetAlert2 CSS and JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+<script>
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+          if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+            // Only send the token to relative URLs i.e. locally.
+            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+          }
+        }
+      });
+      
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Check if this cookie string begins with the name we want
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+      
+</script>
+<script>
+    let prevId = null;
+    let nextId = null;
+
+    $('#upload').on('click',function(){
+        $('#uploadModal').modal('show');
+    });
+
+    function fetchData(currentId) {
+        var instansi = $('#instansi').val();
+        $.ajax({
+            url: "{% url 'pertanyaan_spesifik_get' %}",
+            type: 'GET',
+            data: { current_id: currentId, category: 'spesifik', instansi:instansi },
+            dataType: 'json',
+            success: function(data) {
+                let em_value = data.answered_choice ? data.answered_choice.bobot || "0" : "0";
+                let haveFile = 0;
+                let haveDesc = 0;
+            
+                // Update UI elements with data
+                $('#max_value').text(`Nilai Maksimal = ${data.max_bobot}`);
+                $('#question_name').text(`${data.order}. ${data.name}`);
+                $('#question_description').text(`Catatan : ${data.pertanyaan_description}`);
+                $('#question_instansi_id').val(data.pertanyaan_instansi_id);
+                $('#question_id').val(data.pertanyaan_id);
+                $('#data_pendukung').val(data.answered_choice ? data.answered_choice.text || "" : "");
+                $('#question_choice').empty();
+                $('#file_answer').empty();
+            
+                // Check if description exists
+                haveDesc = data.answered_choice && data.answered_choice.text ? 1 : 0;
+            
+                $('#koreksi-section').css('display', 'none');
+                if (data.answered_final && data.answered_final.catatan) {
+                    $('#Koreksi').removeAttr('readonly'); // Remove read-only
+                    $('#koreksi').val(data.answered_final.catatan || "");
+                    $('#Koreksi').prop('readonly', true);
+                    $('#koreksi-section').css('display', 'block');
+                }
+            
+                // Populate question choices
+                if (Array.isArray(data.choices) && data.choices.length > 0) {
+                    data.choices.forEach(function(choice) {
+                        const choiceElement = `
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="choice" id="choice_${choice.id}" value="${choice.id}" ${data.answered_choice && data.answered_choice.choice === choice.id ? 'checked' : ''} data-bobot="${choice.bobot}" onclick="saveChoice()">
+                                <label class="form-check-label" for="choice_${choice.id}">${choice.name}</label>
+                            </div>`;
+                        $('#question_choice').append(choiceElement);
+                    });
+                } else {
+                    $('#question_choice').append('<p>Pilihan tidak tersedia.</p>');
+                }
+            
+                // Populate files
+                if (data.answered_choice && data.answered_choice.files && data.answered_choice.files.length > 0) {
+                    data.answered_choice.files.forEach(function(file) {
+                        const fileElement = `
+                            <a href="/kla/kla-data/${file.encrypt_name}" download="${file.original_name}">
+                                <i class="fas fa-download"></i> ${file.original_name}
+                            </a>
+                            <a href="/kla/kla-data/${file.encrypt_name}" target="_blank" class="view-file" data-file="/kla/kla-data/${file.encrypt_name}" style="margin-left: 10px;">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="#" class="delete-file" data-file="${file.encrypt_name}" data-id="${file.id}" style="margin-left: 10px;">
+                                <i class="fas fa-times"></i>
+                            </a>
+                            <br>`;
+                        $('#file_answer').append(fileElement);
+                    });
+                    haveFile = 1;
+                } else {
+                    $('#file_answer').append('<p>File belum tersedia.</p>');
+                }
+            
+                // Only display EM value if both files and description exist
+                if (haveFile === 1 && haveDesc === 1) {
+                    $('#em_value').text(`Nilai EM = ${em_value}`);
+                } else {
+                    $('#em_value').text('Nilai EM = 0'); // Clear the EM value if conditions are not met
+                }
+            
+                // Update matriks link
+                /*
+                const matriksLink = document.getElementById('matriks');
+                const encryptedFilename = data.pertanyaan_file ? data.pertanyaan_file[0]?.encrypted_filename : null;
+            
+                if (encryptedFilename) {
+                    matriksLink.href = `/kla/kla-data/${encryptedFilename}`;
+                    matriksLink.style.display = 'inline'; // Show link
+                } else {
+                    matriksLink.style.display = 'none'; // Hide link
+                }
+                */
+
+                // Update matriks link untuk semua file
+                const matriksLinkContainer = document.getElementById('matriks-container'); // Pastikan ada kontainer untuk menampung semua link
+                const pertanyaanFiles = data.pertanyaan_file || []; // Ambil array pertanyaan_file, jika ada
+
+                // Hapus semua link sebelumnya
+                matriksLinkContainer.innerHTML = '';
+
+                // Jika ada file
+                if (pertanyaanFiles.length > 0) {
+                    pertanyaanFiles.forEach(file => {
+                        const encryptedFilename = file?.encrypted_filename;
+                        if (encryptedFilename) {
+                            // Buat elemen link untuk setiap file
+                            const link = document.createElement('a');
+                            link.href = `/kla/kla-data/${encryptedFilename}`;
+                            link.textContent = `${file?.original_filename || 'Download Matriks'}`; // Ganti dengan nama file asli, jika ada
+                            link.style.display = 'inline-block';
+                            link.style.margin = '5px'; // Opsional: Menambahkan margin untuk jarak antar link
+                            
+                            // Tambahkan link ke dalam container
+                            matriksLinkContainer.appendChild(link);
+                        }
+                    });
+                } else {
+                    // Jika tidak ada file, tampilkan pesan
+                    const noFilesMessage = document.createElement('p');
+                    noFilesMessage.textContent = 'Tidak ada file yang tersedia.';
+                    matriksLinkContainer.appendChild(noFilesMessage);
+                }
+            
+                // Update navigation
+                prevId = data.prev_question_id;
+                nextId = data.next_question_id;
+            
+                // Update button states
+                document.getElementById('next').disabled = nextId === null;
+                document.getElementById('prev').disabled = prevId === null;
+                document.getElementById('current').value = currentId;
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching data:", error);
+                Swal.fire('Error!', 'Data gagal diambil.', 'error');
+            }
+        });
+    }
+
+    function saveChoice() {
+        const selectedChoice = document.querySelector('input[name="choice"]:checked');
+        let bobotValue = 0;
+        let choiceValue = 0;
+        if (!selectedChoice) {
+            //alert("Please select a choice before saving.");
+            //return;
+        }else{
+            bobotValue = selectedChoice.getAttribute('data-bobot');
+            choiceValue = selectedChoice.value;
+        }
+        
+        const bobot = bobotValue;
+        const choiceId = choiceValue;
+        const text = $('#data_pendukung').val();
+        const questionId = $('#question_id').val();
+        const questionInstansiId = $('#question_instansi_id').val();
+        const fileInput = document.getElementById('file_input');
+        const name = $('#name').val();
+
+        const formData = new FormData();
+        formData.append('text', text);
+        formData.append('bobot', bobot);
+        formData.append('question_id', questionId);
+        formData.append('question_instansi_id', questionInstansiId);
+        formData.append('choice_id', choiceId);
+        formData.append('name', name);
+
+        if (fileInput.files.length > 0) {
+            formData.append('file_input', fileInput.files[0]);
+        }
+
+        // Add CSRF token
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+        $.ajax({
+            url: "{% url 'pertanyaan_spesifik_post' %}",
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                $('#file_input').val("");
+                $('#name').val("");
+                currentId = $('#current').val();
+                fetchData(currentId);
+                const simpan = $('#simpan').val();
+                if(simpan == "1"){
+                    Swal.fire('Berhasil!', response.message, 'success');
+                    $('#simpan').val("0");
+                }
+                $('#dataBenar').prop('checked', false);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error saving choice:", error);
+                Swal.fire('Gagal!', 'Data gagal disimpan', 'error');
+                $('#dataBenar').prop('checked', false);
+            }
+        });
+    }
+
+    $(document).on('click', '.delete-file', function() {
+        // Get the value of the data-file attribute
+        const filePath = $(this).attr('data-file');
+        const id = $(this).data('id');
+
+        // Store the ID in the hidden input field
+        $('#deleteId').val(id);
+            
+        // Show the delete confirmation modal
+        $('#deleteModal').modal('show');
+    });
+
+    // Confirm delete button in the modal
+    $(document).on('click', '#confirmDelete', function() {
+        const id = $('#deleteId').val();
+
+        $.ajax({
+            url: "{% url 'filejawaban_data' %}",
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            data: {
+                action: 'delete',
+                id: id
+            },
+            success: function(response) {
+                if (response.success) {
+                    currentId = $('#current').val();
+                    fetchData(currentId);
+                    $('#deleteModal').modal('hide'); // Hide the modal
+                    Swal.fire(
+                        'Hapus Data!',
+                        'Data berhasil dihapus.',
+                        'success'
+                    );
+                } else {
+                    //alert("An error occurred while deleting.");
+                    Swal.fire('Error!', 'Data gagal dihapus.', 'error');
+                }
+            },
+            error: function() {
+                //alert("An error occurred while deleting.");
+                Swal.fire('Error!', 'Data gagal dihapus.', 'error');
+            }
+        });
+    });
+
+    $(document).on('click', '#save', function() {
+        $('#simpan').val("1");
+        //saveChoice();
+        // Cek apakah checkbox dicentang
+        if ($('input[type="checkbox"]:checked').length > 0) {
+            // Jika ada checkbox yang dicentang, panggil fungsi saveChoice
+            saveChoice();
+        } else {
+            // Tampilkan pesan peringatan jika tidak ada checkbox yang dicentang
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan',
+                text: 'Silakan centang pernyataan untuk melanjutkan.',
+            });
+        }
+    });
+
+    function checkAndSave() {
+        //return 1;
+        const textAreaValue = document.getElementById('data_pendukung').value; // Get the value of the textarea
+        const fileValue = document.getElementById('file_input').value; // Get the value of the file input
+    
+        // Check if the textarea is not empty or if a file has been selected
+        if (textAreaValue.trim() !== '' || fileValue.trim() !== '') {
+            saveChoice(); // Call saveChoice if either is not empty
+        }
+    }
+
+    // Call fetchData with the initial question ID (or 1 if starting from the first)
+    fetchData(1);
+</script>
+
+{% endblock  %}
+

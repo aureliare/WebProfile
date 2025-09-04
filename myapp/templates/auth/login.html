@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+{% endblock  %}
+
+{% block content %}
+<!-- Navbar -->
+<nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+      </li>
+    </ul>
+  </nav>
+  <!-- /.navbar -->
+
+  <!-- Main Sidebar Container -->
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+  <div class="sidebar">
+      <nav class="mt-5">
+          <form class="form-horizontal" method="POST">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.GET.next }}">
+              <input type="hidden" name="captcha_key" value="{{captcha_key}}">
+              <div class="card-body">
+                  <div class="form-group row">
+                      <div class="col-sm-12">
+                          <input type="text" class="form-control" id="username" name="username" placeholder="Email" required oninvalid="this.setCustomValidity('Silahkan isikan Email')" oninput="this.setCustomValidity('')">
+                      </div>
+                  </div>
+                  <div class="form-group row">
+                      <div class="col-sm-12">
+                          <input type="password" class="form-control" id="password" name="password" placeholder="Password" required oninvalid="this.setCustomValidity('Silahkan isikan Password')" oninput="this.setCustomValidity('')">
+                      </div>
+                  </div>
+                  <div class="form-group row">
+                      <div class="col-sm-12">
+                          <select name="role" id="role" class="form-control" required oninvalid="this.setCustomValidity('Silahkan isikan Role')" oninput="this.setCustomValidity('')">
+                              <option value="">Pilih Role</option>
+                              <option value="admin">Admin</option>
+                              <option value="verifikator">Verifikator</option>
+                              <option value="operator">Operator</option>
+                          </select>
+                      </div>
+                  </div>
+                  <div class="form-group row">
+                    <div class="col-sm-12">
+                      <img src="{{ captcha_image_url }}" alt="CAPTCHA" class="img-responsive" style="border-radius:5px;">
+                    </div>
+                  </div>
+                  <div class="form-group row" style="margin-top:20px">
+                    <div class="col-sm-12">
+                      <input type="text" name="captcha_response" class="form-control" placeholder="Captcha" required oninvalid="this.setCustomValidity('Silahkan isikan Captcha')" oninput="this.setCustomValidity('')">
+                    </div>
+                  </div>
+              </div>
+              
+              <div class="card-footer d-flex justify-content-between">
+                  {% comment %} <button type="button" class="btn btn-default btn-sm">Lupa Password</button> {% endcomment %}
+                  {% comment %} <a href="{% url 'password_reset' %}" class="btn btn-default btn-sm">Lupa Password</a> {% endcomment %}
+                  <!-- Button to open modal -->
+                  <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#resetPasswordModal">Lupa Password</button>
+                  <button type="submit" class="btn btn-info btn-sm">Log In</button>
+              </div>
+          </form>
+        
+
+          {% if form.non_field_errors %}
+              <div class="alert alert-danger">
+                  {{ form.non_field_errors }}
+              </div>
+          {% endif %}
+          
+          {% if messages %}
+              {% for message in messages %}
+                  <div class="alert alert-danger">{{ message }}</div>
+              {% endfor %}
+          {% endif %}
+      </nav>
+  </div>
+</aside>
+
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0"></h1>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-12">
+            <div class="small-box text-center">
+              <img src="{% static 'adminlte/default/logo_dp3a_bekasikab_no_bg.png' %}" alt="">
+              <img src="{% static 'adminlte/default/logo_bekasi.png' %}" alt="">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+
+  <!-- Reset Password Modal -->
+<div class="modal fade" id="resetPasswordModal" tabindex="-1" role="dialog" aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="resetPasswordModalLabel">Reset Password</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="resetPasswordForm">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary">Kirim Kode Reset</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<!-- Include SweetAlert2 CSS and JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+<script>
+  $(document).ready(function() {
+    $('#resetPasswordForm').on('submit', function(event) {
+        event.preventDefault(); // Prevent the form from submitting normally
+
+        var email = $('#email').val();
+
+        $.ajax({
+            type: 'POST',
+            url: '{% url "password_reset" %}',  // Update this URL to match your Django URL
+            data: {
+                email: email,
+                csrfmiddlewaretoken: '{{ csrf_token }}'  // Include CSRF token
+            },
+            success: function(response) {
+              $('#email').val("");
+                Swal.fire(
+                    'Sukses!',
+                    'Kode reset telah dikirim ke email Anda.',
+                    'success'
+                );
+                $('#resetPasswordModal').modal('hide'); // Close the modal
+            },
+            error: function(xhr) {
+              $('#email').val("");
+                Swal.fire(
+                    'Gagal!',
+                    'Terjadi kesalahan: ' + xhr.responseText,
+                    'error'
+                );
+            },
+            complete: function() {
+                // Hide loading indicator when the request is complete
+                $('#email').val("");
+            }
+        });
+    });
+});
+
+
+</script>
+{% endblock js %}

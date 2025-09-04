@@ -1,0 +1,1809 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock  %}
+
+
+{% block content %}
+  {% include "components/_navbar.html" %}
+  {% include "components/_main_sidebar_container.html" %}
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0">{{ title }}</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Admin</a></li>
+              <li class="breadcrumb-item active">{{ title }}</li>
+            </ol>
+          </div><!-- /.col -->
+        </div>
+      </div>
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-12">
+            <div class="small-box">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-info">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /.content -->
+     
+    <section class="content">
+      <div class="container-fluid">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="form-group">
+                                <select name="formSelected" id="formSelected" class="form-control select2bs4" required oninvalid="this.setCustomValidity('Silahkan isikan Form')" oninput="this.setCustomValidity('')">
+                                    <option value="">Pilih Formulir</option>
+                                </select>
+                            </div>
+                            <div class="form-group d-none">
+                                <select name="instansiSelected" id="instansiSelected" class="form-control select2bs4">
+                                    <option value="">Pilih Instansi</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <button type="button" class="btn btn-primary btn-add">
+                                    <i class="fa fa-plus"></i> {{ title }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">                        
+                        <div class="row">
+                            <div class="col-lg-4 form-group d-none">
+                                <label for="indikator">Indikator</label>
+                                <select name="indikator" id="indikator" class="form-control select2bs4" onchange="refresh()">
+                                  <option value="">Pilih</option>
+                                </select>
+                              </div>
+                              <div class="col-lg-2 form-group d-none">
+                                <label for="level">Level</label>
+                                <select name="level" id="level" class="form-control select2bs4" onchange="refresh()">
+                                  <option value="">Pilih</option>
+                                </select>
+                              </div>
+                              <div class="col-lg-2 form-group d-none">
+                                <label for="pengampu">Pengampu</label>
+                                <select name="pengampu" id="pengampu" class="form-control select2bs4" onchange="refresh()">
+                                  <option value="">Pilih</option>
+                                </select>
+                              </div>
+                              <div class="col-lg-2 form-group d-none">
+                                <label for="status">Status</label>
+                                <select name="status" id="status" class="form-control select2bs4" onchange="refresh()">
+                                  <option value="">Pilih</option>
+                                </select>
+                              </div>
+                              <div class="table-responsive">
+                                <table id="ListTable" class="table table-bordered table-hover table-striped" width="100%">
+                                  <thead>
+                                    <tr>
+                                      <td>No</td>
+                                      <td>ID</td>
+                                      <td>Tahun</td>
+                                      <td>Form</td>
+                                      <td>Urutan</td>
+                                      <td>Pertanyaan</td>
+                                      <td>Jawaban</td>
+                                      <td>Jenis</td>
+                                      <td>Kategori</td>
+                                      <td>#</td>
+                                    </tr>
+                                  </thead>
+                                  <tbody></tbody>
+                                  <tfoot></tfoot>
+                                </table>
+                              </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!-- /.content-wrapper -->
+
+  <!-- Add Pertanyaan Baku Modal -->
+<div class="modal fade" id="addModal" tabindex="" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addModalLabel">Tambah {{ title }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addForm">
+                    <div class="form-group">
+                        <label for="form">Formulir</label>
+                        <select name="form" id="form" class="form-control select2bs4" required oninvalid="this.setCustomValidity('Silahkan isikan Form')" oninput="this.setCustomValidity('')">
+                            <option value="">Pilih Formulir</option>
+                        </select>
+                    </div>
+                    <div class="form-group d-none">
+                        <label for="instansi">Instansi</label>
+                        <select name="instansi" id="instansi" class="form-control select2bs4">
+                            <option value="">Pilih Instansi</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="order">Urutan</label>
+                        <input type="number" class="form-control" id="order" name="order" rows="10" required oninvalid="this.setCustomValidity('Silahkan isikan Urutan')" oninput="this.setCustomValidity('')">
+                    </div>
+                    <div class="form-group">
+                        <label for="pertanyaan">Pertanyaan</label>
+                        <select name="pertanyaan" id="pertanyaan" class="form-control select2bs4" required oninvalid="this.setCustomValidity('Silahkan isikan Pertanyaan')" oninput="this.setCustomValidity('')">
+                            <option value="">Pilih Pertanyaan</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="jawaban">
+                        <label for="jawaban">Jawaban</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="type">Jenis</label>
+                        <select name="type" id="type" class="form-control select2bs4">
+                            <option value="">Pilih Jenis</option>
+                            <option value="multiple">Pilihan Ganda</option>
+                            <option value="long-text">Teks Panjang</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Kategori</label>
+                        <select name="category" id="category" class="form-control select2bs4">
+                            <option value="">Pilih Kategori</option>
+                            <option value="baku">Baku</option>
+                            <option value="spesifik">Spesifik</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="fileUploadContainer">
+                        <label>Upload File</label>
+                        <div class="d-flex align-items-center">
+                            <div class="file-input flex-grow-1">
+                                <input type="file" name="files[]" multiple class="form-control col form-control-file">
+                                <button type="button" class="col btn btn-danger remove-file" style="display:none;">-</button>
+                            </div>
+                            <button type="button" class="col btn btn-secondary ml-2" id="addFileButton">+</button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+  <!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Ubah {{ title }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="editFormulir">Formulir</label>
+                        <select name="editFormulir" id="editFormulir" class="form-control select2bs4" required oninvalid="this.setCustomValidity('Silahkan isikan Form')" oninput="this.setCustomValidity('')">
+                            <option value="">Pilih Formulir</option>
+                        </select>
+                    </div>
+                    <div class="form-group d-none">
+                        <label for="editInstansi">Instansi</label>
+                        <select name="editInstansi" id="editInstansi" class="form-control select2bs4" required oninvalid="this.setCustomValidity('Silahkan isikan Instansi')" oninput="this.setCustomValidity('')">
+                            <option value="">Pilih Instansi</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editOrder">Urutan</label>
+                        <input type="number" class="form-control" id="editOrder" name="editOrder" rows="10" required oninvalid="this.setCustomValidity('Silahkan isikan Urutan')" oninput="this.setCustomValidity('')">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPertanyaan">Pertanyaan</label>
+                        <select name="editPertanyaan" id="editPertanyaan" class="form-control select2bs4" required oninvalid="this.setCustomValidity('Silahkan isikan Pertanyaan')" oninput="this.setCustomValidity('')">
+                            <option value="">Pilih Pertanyaan</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="editJawaban">
+                        <label for="jawaban">Jawaban</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="editType">Jenis</label>
+                        <select name="editType" id="editType" class="form-control select2bs4" required oninvalid="this.setCustomValidity('Silahkan isikan Jenis')" oninput="this.setCustomValidity('')">
+                            <option value="">Pilih Jenis</option>
+                            <option value="multiple">Pilihan Ganda</option>
+                            <option value="long-text">Teks Panjang</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editCategory">Kategori</label>
+                        <select name="editCategory" id="editCategory" class="form-control select2bs4" required oninvalid="this.setCustomValidity('Silahkan isikan Kategori')" oninput="this.setCustomValidity('')">
+                            <option value="">Pilih Kategori</option>
+                            <option value="baku">Baku</option>
+                            <option value="spesifik">Spesifik</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="editFileUploadContainer">
+                        <label>Upload File</label>
+                        <div class="d-flex align-items-center">
+                            <div class="file-input flex-grow-1">
+                                <input type="file" name="editFiles[]" id="editFiles" class="form-control col form-control-file">
+                                <button type="button" class="col btn btn-danger remove-file" style="display:none;">-</button>
+                            </div>
+                            <button type="button" class="col btn btn-secondary ml-2" id="editFileButton">+</button>
+                        </div>
+                    </div>
+                    <input type="hidden" id="editId">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
+                <button type="button" class="btn btn-primary" id="saveChanges">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Konfirmasi {{ title }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah anda ingin mengganti Formulir {{ title }} ini?</p>
+                <input type="hidden" id="deleteId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">Hapus</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModalFile" tabindex="-1" role="dialog" aria-labelledby="deleteModalFileLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalFileLabel">Konfirmasi File</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah anda ingin menghapus data File ini?</p>
+                <input type="hidden" id="deleteId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteFile">Hapus</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Confirmation Modal -->
+<div class="modal fade" id="addConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Konfirmasi {{ title }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah anda ingin mengganti data formulir?</p>
+                <input type="hidden" id="addId">
+            </div>
+            <div class="modal-footer">
+                {% comment %} <button type="button" class="btn btn-secondary" data-dismiss="modal">Tidak</button> {% endcomment %}
+                <button type="button" class="btn btn-secondary" id="confirmNo">Tidak</button>
+                <button type="button" class="btn btn-danger" id="confirmAdd">Ya</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="filesModal" tabindex="-1" role="dialog" aria-labelledby="filesModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filesModalLabel">File Pertanyaan</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table id="filesTable" class="table table-striped table-bordered" width="100%">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama File</th>
+                            <th>#</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block js %}
+<!-- datatables -->
+<script src="{% static "adminlte/plugins/datatables/jquery.dataTables.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-responsive/js/dataTables.responsive.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-responsive/js/responsive.bootstrap4.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-buttons/js/dataTables.buttons.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-buttons/js/buttons.bootstrap4.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/jszip/jszip.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/pdfmake/pdfmake.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/pdfmake/vfs_fonts.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-buttons/js/buttons.html5.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-buttons/js/buttons.print.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-buttons/js/buttons.colVis.min.js" %}"></script>
+
+<!-- Include SweetAlert2 CSS and JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+<!-- selet2 -->
+<script src="{% static "adminlte/plugins/select2/js/select2.full.min.js" %}"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const addFileButton = document.getElementById('addFileButton');
+        const fileUploadContainer = document.getElementById('fileUploadContainer');
+        const editFileButton = document.getElementById('editFileButton');
+        const editFileUploadContainer = document.getElementById('editFileUploadContainer');
+
+        function createFileInput(container, name) {
+            const fileInputDiv = document.createElement('div');
+            fileInputDiv.className = 'file-input d-flex align-items-center mb-2';
+            fileInputDiv.innerHTML = `
+                <input type="file" name="${name}[]" class="form-control-file" required>
+                <button type="button" class="btn btn-danger remove-file ml-2">-</button>
+            `;
+            container.appendChild(fileInputDiv);
+    
+            const removeButton = fileInputDiv.querySelector('.remove-file');
+            removeButton.style.display = 'inline';
+    
+            removeButton.addEventListener('click', function() {
+                container.removeChild(fileInputDiv);
+            });
+        }
+
+        if (addFileButton) {
+            addFileButton.addEventListener('click', function() {
+                createFileInput(fileUploadContainer, 'files');
+            });
+        } else {
+            console.error('Add file button not found.');
+        }
+
+        if (editFileButton) {
+            editFileButton.addEventListener('click', function() {
+                createFileInput(editFileUploadContainer, 'editFiles');
+            });
+        } else {
+            console.error('Edit Add file button not found.');
+        }
+    });
+</script>
+
+<script>
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+          if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+            // Only send the token to relative URLs i.e. locally.
+            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+          }
+        }
+      });
+      
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Check if this cookie string begins with the name we want
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+      
+</script>
+
+  <!-- Custome JS -->
+  <script>
+    $(document).on("keyup",".trim", function () {
+      if (this.value != this.value.replace(/\s/g, '')) {
+        this.value = this.value.replace(/\s/g, '');
+      }
+    });
+  </script>
+
+  <script>
+    function fetchSelectedData(element, id, url, defaultValue, param) {
+        $.ajax({
+            url: url, // Ensure this URL is correct
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            data: {
+                action: 'select', // Adjust as needed
+                form_id: id // Send the form ID if necessary
+            },
+            success: function(data) {
+                console.log('Data Response:', data);
+                // Map the data to the expected format
+                const options = data.results.map(item => ({
+                    id: item.id, // Use the appropriate field name for ID
+                    text: item.text // Use the appropriate field name for text
+                }));
+    
+                // Initialize select2 on the specified element
+                $('#' + element).select2({
+                    data: options,
+                    theme: 'bootstrap4',
+                    //minimumInputLength: 1, // Minimum characters before triggering AJAX
+                    placeholder: 'Pilih '+defaultValue,
+                    allowClear: true // Allow clearing of the selection
+                });
+    
+                // Set the value of the select2 element based on the form ID
+                $('#' + element).val(id).trigger('change');
+            },
+            error: function(xhr) {
+                console.error('Error:', xhr);
+            }
+        });
+    }
+    
+    function refresh() {
+        let pengampu = 0;
+        let indikator = 0;
+        let level = 0;
+        let status = 0;
+    
+        $("#ListTable").DataTable({
+            'bDestroy': true,
+            'processing': true,
+            'ordering': true,
+            'scrollX': true,
+            'order': [],
+            'ajax': {
+                url: "{% url 'pertanyaan_baku_data' %}?pengampu=" + pengampu + "&indikator=" + indikator + "&level=" + level + "&status=" + status,
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken') // Include CSRF token here
+                },
+            },
+            'columns': [
+                { data: 'no', title: 'No', className: "text-center" },  // Incremental number
+                { data: 'id', title: 'ID', className: "text-center", visible: false },   // ID Column
+                { data: 'form__year', title: 'Tahun', className: "text-left" }, // Name Column
+                { data: 'form__name', title: 'Form', className: "text-left" }, // Name Column
+                { data: 'order', title: 'Urutan', className: "text-left" }, // Name Column
+                { data: 'pertanyaan__name', title: 'Pertanyaan', className: "text-left" }, // Name Column
+                {
+                    data: 'pertanyaan',
+                    title: 'Jawaban',
+                    className: "text-left",
+                    render: function(data, type, row, meta) {
+                        //console.log('Meta:', meta); // Cek informasi meta
+                        //console.log('Row data:', row); // Cek data row
+                    
+                        // Tampilkan loading indicator
+                        $(meta.settings.aoData[meta.row].nTr).find('td').eq(meta.col-1).html('');
+                    
+                        // AJAX request
+                        $.ajax({
+                            url: '{% url 'pilihan_data' %}?pertanyaan_id=' + data,
+                            type: 'POST',
+                            headers: {
+                                'X-CSRFToken': getCookie('csrftoken')
+                            }
+                        })
+                        .done(function(response) {
+                            //console.log('Response:', response); // Cek respons
+                            
+                            var newValue;
+                            if (response.data && response.data.length > 0) {
+                                var values = response.data.map(function(item) {
+                                    return item.master_pilihan_id__name + ' bobot = ' + item.bobot;
+                                });
+                                newValue = values.join(', ');
+                            } else {
+                                newValue = 'Tidak ada data';
+                            }
+                            //console.log('New Value:', newValue); // Log nilai baru
+                            $(meta.settings.aoData[meta.row].nTr).find('td').eq(meta.col-1).html(newValue);
+                        })
+                        .fail(function(xhr) {
+                            //console.error('AJAX Error:', xhr); // Log kesalahan
+                            $(meta.settings.aoData[meta.row].nTr).find('td').eq(meta.col-1).html('Terjadi kesalahan: ' + xhr.responseText);
+                        });
+                    
+                        return ''; // Tampilkan loading indicator
+                    }
+                    
+                    
+                },                
+                {
+                    data: 'type',
+                    title: 'Jenis',
+                    className: "text-left",
+                    render: function(data, type, row) {
+                        // Menggunakan switch untuk mengubah tipe ke format yang lebih user-friendly
+                        switch (data) {
+                            case 'text':
+                                return 'Teks';
+                            case 'multiple':
+                                return 'Pilihan Ganda';
+                            case 'checkbox':
+                                return 'Checkbox';
+                            case 'date':
+                                return 'Tanggal';
+                            case 'likert':
+                                return 'Skala Likert';
+                            case 'multi-select':
+                                return 'Pilih Banyak';
+                            case 'file':
+                                return 'Unggah File';
+                            case 'rating':
+                                return 'Rating';
+                            case 'long-text':
+                                return 'Teks Panjang';
+                            default:
+                                return 'Tidak Diketahui';
+                        }
+                    }
+                },                
+                {
+                    data: 'category',
+                    title: 'Kategori',
+                    className: "text-left",
+                    render: function(data, type, row) {
+                        // Here, you can modify how the data is displayed
+                        // For example, capitalizing the first letter
+                        return data.charAt(0).toUpperCase() + data.slice(1).toLowerCase();
+                    }
+                },
+                { 
+                    data: null,
+                    title: '#',
+                    className: "text-center",
+                    render: function(data, type, row) {
+                        // Check if deleted_at is not null
+                        const deleteButton = row.deleted_at ? '' : `
+                            <button class="btn btn-danger btn-delete" data-id="${row.id}" title="Hapus Data"><i class="fa fa-times"></i></button>
+                        `;
+                        const deactivateButton = row.is_active ? `
+                            <button class="btn btn-warning btn-deactivate" data-id="${row.id}"><i class="fa fa-ban"></i></button>
+                        ` : `<button class="btn btn-warning btn-activate" data-id="${row.id}" title="Nonaktifkan Data"><i class="fa fa-check"></i></button>`;
+                        return `
+                            <button class="btn btn-info btn-edit" data-id="${row.id}" data-form="${row.form}" data-instansi="${row.instansi}" data-order="${row.order}" data-pertanyaan="${row.pertanyaan}" data-type="${row.type}" data-category="${row.category}"><i class="fa fa-edit" title="Ubah Data"></i></button>
+                            <button class="btn btn-primary btn-view-files" data-id="${row.id}"><i class="fa fa-file" title="Lihat File"></i></button>
+                            ${deleteButton}
+                        `;
+                    }
+                }
+            ],
+            'language': {
+                'emptyTable': 'Data tidak tersedia',
+                'info': 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
+                'infoEmpty': 'Menampilkan 0 sampai 0 dari 0 data',
+                'infoFiltered': '(sorting dari _MAX_ total data)',
+                'lengthMenu': 'Menampilkan _MENU_ data',
+                'zeroRecords': 'Ooops,.. Maaf data yang anda cari tidak ada',
+                'search': 'Pencarian : ',
+                'paginate': {
+                    'first': 'Awal',
+                    'last': 'Akhir',
+                    'next': 'Berikutnya',
+                    'previous': 'Sebelumnya'
+                }
+            },
+            'dom': 'Bfrtip', // Menambahkan posisi untuk button
+            'buttons': [
+                {
+                    extend: 'copyHtml5',
+                    text: '<i class="fa fa-copy"></i> Salin',
+                    titleAttr: 'Salin',
+                    className: 'btn btn-secondary'
+                },
+                {
+                    extend: 'excelHtml5',
+                    text: '<i class="fa fa-file-excel"></i> Excel',
+                    titleAttr: 'Ekspor ke Excel',
+                    className: 'btn btn-success'
+                },
+                {
+                    extend: 'csvHtml5',
+                    text: '<i class="fa fa-file-csv"></i> CSV',
+                    titleAttr: 'Ekspor ke CSV',
+                    className: 'btn btn-info'
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: '<i class="fa fa-file-pdf"></i> PDF',
+                    titleAttr: 'Ekspor ke PDF',
+                    className: 'btn btn-danger'
+                },
+                {
+                    extend: 'print',
+                    text: '<i class="fa fa-print"></i> Print',
+                    titleAttr: 'Print',
+                    className: 'btn btn-warning'
+                }
+            ]
+        });        
+    
+        // Event delegation for edit button
+        $('#ListTable tbody').on('click', '.btn-edit', function() {
+            const id = $(this).data('id');
+            const form = $(this).data('form'); // Pastikan ini adalah ID yang benar
+            //const instansi = $(this).data('instansi');
+            const order = $(this).data('order');
+            const pertanyaan = $(this).data('pertanyaan');
+            const type = $(this).data('type');
+            const category = $(this).data('category');
+        
+            console.log('Form value:', form); // Log untuk memverifikasi
+        
+            // Tampilkan modal
+            $('#editModal').modal('show');
+
+            /*
+            $('#editFileButton').prop('disabled', true);
+            $('input[name="files[]"]').prop('disabled', true);
+
+            // Enable file input when a question is selected
+            $('#editPertanyaan').on('change', function() {
+                if ($(this).val()) {
+                    
+                    $('#editFileButton').prop('disabled', false);
+                    $('input[name="files[]"]').prop('disabled', false);
+                } else {
+                    
+                    $('#editFileButton').prop('disabled', true);
+                    $('input[name="files[]"]').prop('disabled', true);
+                }
+            });
+            */
+        
+            // Atur nilai di select2
+            $('#editFormulir').val(null).trigger('change'); // Pastikan 'editFormulir' adalah ID yang benar
+        
+            // Lakukan permintaan AJAX untuk mendapatkan data
+            fetchSelectedData('editFormulir',form,'{% url "form_data" %}','Formulir',null);
+           
+
+            //$('#editInstansi').val(null).trigger('change');
+
+            // Lakukan permintaan AJAX untuk mendapatkan data
+            /*
+            $.ajax({
+                url: '{% url "instansi_data" %}',
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                data: {
+                    action: 'select', // Sesuaikan dengan kebutuhan Anda
+                    instansi_id: instansi // Kirim ID form jika perlu
+                },
+                success: function(data) {
+                    // Pastikan respons memiliki format yang benar
+                    console.log('Data Respons:', data);
+                    // Misalnya, jika data.results adalah array objek yang memiliki id dan text
+                    const options = data.results.map(item => ({
+                        id: item.id, // Ganti dengan field ID yang sesuai
+                        text: item.text // Ganti dengan field text yang sesuai
+                    }));
+                    // Set hasil ke select2
+                    $('#editInstansi').select2({
+                        data: options,
+                        theme: 'bootstrap4',
+                        minimumInputLength: 1, // Minimum characters before triggering AJAX
+                        placeholder: 'Pilih Instansi',
+                        allowClear: true // Allow clearing of the selection
+                    });
+                    // Atur nilai select2 berdasarkan form
+                    $('#editInstansi').val(instansi).trigger('change');
+                },
+                error: function(xhr) {
+                    console.error('Error:', xhr);
+                }
+            });
+            */
+
+            $('#editOrder').val(order);
+            $('#editPertanyaan').val(null).trigger('change');
+
+            // Lakukan permintaan AJAX untuk mendapatkan data
+            $.ajax({
+                url: '{% url "pertanyaan_data" %}?category_pertanyaan=baku',
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                data: {
+                    action: 'select', // Sesuaikan dengan kebutuhan Anda
+                    pertanyaan_id: pertanyaan, // Kirim ID form jika perlu
+                    category_pertanyaan: 'baku'
+                },
+                success: function(data) {
+                    // Pastikan respons memiliki format yang benar
+                    console.log('Data Respons:', data);
+                    // Misalnya, jika data.results adalah array objek yang memiliki id dan text
+                    const options = data.results.map(item => ({
+                        id: item.id, // Ganti dengan field ID yang sesuai
+                        text: item.text // Ganti dengan field text yang sesuai
+                    }));
+                    // Set hasil ke select2
+                    $('#editPertanyaan').select2({
+                        data: options,
+                        theme: 'bootstrap4',
+                        //minimumInputLength: 1, // Minimum characters before triggering AJAX
+                        placeholder: 'Pilih Pertanyaan',
+                        allowClear: true // Allow clearing of the selection
+                    });
+                    // Atur nilai select2 berdasarkan form
+                    $('#editPertanyaan').val(pertanyaan).trigger('change');
+
+                    $('#editPertanyaan').on('change', function(event) {
+                        event.preventDefault(); // Prevent the default form submission
+                
+                        // Ambil nilai dari dropdown
+                        const pertanyaanId = $(this).val(); // Gunakan 'this' untuk mendapatkan nilai saat ini
+                
+                        if ($(this).val() === '') {
+                            // Only clear #type and #category if they are currently filled
+                            if ($('#editType').val() !== '') {
+                                $('#editType').val('').trigger('change');
+                            }
+                    
+                            if ($('#editCategory').val() !== '') {
+                                $('#editCategory').val('').trigger('change');
+                            }
+                        }
+                
+                        if(pertanyaanId){
+                            $.ajax({
+                                url: "{% url 'pertanyaan_data' %}?pertanyaan_id=" + pertanyaanId + "&category_pertanyaan=baku", // Menggunakan nilai yang benar
+                                type: 'POST',
+                                headers: {
+                                    'X-CSRFToken': getCookie('csrftoken')
+                                },
+                                data: {
+                                    category_pertanyaan: 'baku',
+                                },
+                                success: function(response) {
+                                    if (response.success) {
+                                        $('#editType').val(response.data[0].type).trigger('change'); // Menggunakan jQuery untuk mengatur nilai
+                                        $('#editCategory').val(response.data[0].category).trigger('change'); // Menggunakan jQuery untuk mengatur nilai
+                                        // Check the question category before making the AJAX call
+                                        if (response.data[0].type === 'multiple' || response.data[0].type === 'multi-select') {
+                                            $.ajax({
+                                                url: "{% url 'pilihan_data' %}?pertanyaan_id=" + pertanyaanId,
+                                                type: 'POST',
+                                                headers: {
+                                                    'X-CSRFToken': getCookie('csrftoken')
+                                                },
+                                                success: function(response) {
+                                                    if (response.success) {
+                                                        const typeLabels = {
+                                                            multiple: 'Pilihan Ganda',
+                                                            checkbox: 'Checkbox',
+                                                            'multi-select': 'Pilih Banyak',
+                                                        };
+                    
+                                                        let html = ''; // Initialize HTML variable
+                                                        const questions = {}; // To store questions and their options
+                    
+                                                        // Organize questions and their corresponding options
+                                                        response.data.forEach(function(item) {
+                                                            const questionId = item.pertanyaan_id; // Assume this is how to identify the question
+                                                            if (!questions[questionId]) {
+                                                                questions[questionId] = {
+                                                                    label: typeLabels[item.pertanyaan__type] || 'Tidak Diketahui',
+                                                                    type: item.pertanyaan__type,
+                                                                    options: [] // Initialize an empty array for options
+                                                                };
+                                                            }
+                    
+                                                            // Push the option to the corresponding question
+                                                            questions[questionId].options.push({
+                                                                id: item.master_pilihan_id,
+                                                                name: item.master_pilihan_id__name,
+                                                                bobot: item.bobot
+                                                            });
+                                                        });
+                    
+                                                        // Generate the HTML based on organized questions
+                                                        Object.keys(questions).forEach(questionId => {
+                                                            const question = questions[questionId];
+                                                            let inputHtml = '';
+                    
+                                                            switch (question.type) {
+                                                                case 'multiple':
+                                                                case 'multi-select':
+                                                                    inputHtml = question.options.map(option => `
+                                                                        <div class="form-check">
+                                                                            <input type="radio" name="jawaban-${questionId}" id="jawaban-${questionId}-${option.id}" value="${option.id}" class="form-check-input">
+                                                                            <label class="form-check-label" for="jawaban-${questionId}-${option.id}">
+                                                                                ${option.name} (${option.bobot})
+                                                                            </label>
+                                                                        </div>
+                                                                    `).join('');
+                                                                    break;
+                                                                default:
+                                                                    break;
+                                                            }
+                    
+                                                            // Combine the label and input HTML
+                                                            html += `<div class="form-group">
+                                                                <label for="jawaban">${question.label}</label>
+                                                                ${inputHtml}
+                                                            </div>`;
+                                                        });
+                    
+                                                        $('#editJawaban').html(html);
+                                                    } else {
+                                                        Swal.fire(
+                                                            'Error!',
+                                                            response.message,
+                                                            'error'
+                                                        );
+                                                    }
+                                                }
+                                            });
+                                        } else {
+                                            // Handle non-multiple/multi-select question types here
+                                            const typeLabels = {
+                                                text: 'Teks',
+                                                checkbox: 'Checkbox',
+                                                date: 'Tanggal',
+                                                likert: 'Skala Likert',
+                                                file: 'Unggah File',
+                                                rating: 'Rating',
+                                                'long-text': 'Teks Panjang',
+                                            };
+                    
+                                            let html = '';
+                    
+                                            response.data[0].type.forEach(function(item) {
+                                                const label = typeLabels[item.type] || 'Tidak Diketahui';
+                                                let inputHtml = '';
+                    
+                                                switch (item.type) {
+                                                    case 'text':
+                                                        inputHtml = `<input type="text" name="jawaban" id="jawaban-${item.id}" class="form-control">`;
+                                                        break;
+                                                    case 'long-text':
+                                                        inputHtml = `<textarea name="jawaban" id="jawaban-${item.id}" class="form-control"></textarea>`;
+                                                        break;
+                                                    case 'date':
+                                                        inputHtml = `<input type="date" name="jawaban" id="jawaban-${item.id}" class="form-control">`;
+                                                        break;
+                                                    case 'file':
+                                                        inputHtml = `<input type="file" name="jawaban" id="jawaban-${item.id}" class="form-control">`;
+                                                        break;
+                                                    case 'rating':
+                                                        inputHtml = `<select name="jawaban" id="jawaban-${item.id}" class="form-control select2bs4">
+                                                                        <option value="">Pilih Rating</option>
+                                                                        <option value="1">1 ⭐</option>
+                                                                        <option value="2">2 ⭐⭐</option>
+                                                                        <option value="3">3 ⭐⭐⭐</option>
+                                                                        <option value="4">4 ⭐⭐⭐⭐</option>
+                                                                        <option value="5">5 ⭐⭐⭐⭐⭐</option>
+                                                                    </select>`;
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                    
+                                                // Combine the label and input HTML
+                                                html += `<div class="form-group">
+                                                    <label for="jawaban">${label}</label>
+                                                    ${inputHtml}
+                                                </div>`;
+                                            });
+                    
+                                            $('#editJawaban').html(html);
+                                        }
+                                    } else {
+                                        Swal.fire(
+                                            'Error!',
+                                            response.message,
+                                            'error'
+                                        );
+                                    }
+                                },
+                                error: function() {
+                                    Swal.fire(
+                                        'Error!',
+                                        'Data gagal ditambahkan.',
+                                        'error'
+                                    );
+                                }
+                            });
+                        }else{
+                            $('#editJawaban').html("");
+                        }
+                      });
+                },
+                error: function(xhr) {
+                    console.error('Error:', xhr);
+                }
+            });
+
+            $('#editType').val(type).trigger('change');
+            $('#editCategory').val(category).trigger('change');
+            $('#editId').val(id);
+            
+            // Fokus pada input
+            $('#editFormulir').focus(); 
+        });
+        
+        $('#saveChanges').on('click', function() {
+            const id = $('#editId').val();
+            const newForm = $('#editFormulir').val();
+            //const newInstansi = $('#editInstansi').val();
+            const newOrder = $('#editOrder').val();
+            const newPertanyaan = $('#editPertanyaan').val();
+            const newType = $('#editType').val();
+            const newCategory = $('#editCategory').val();
+
+            const files = $('input[name="editFiles[]"]');
+            let totalFiles = 0;
+
+            files.each(function() {
+                totalFiles += this.files.length;
+            });
+
+            console.log(`Total files selected: ${totalFiles}`);
+            
+            const formData = new FormData();
+            formData.append('action', 'edit');
+            formData.append('id', id);
+            formData.append('form', newForm);
+            //formData.append('instansi', newInstansi);
+            formData.append('order', newOrder);
+            formData.append('pertanyaan', newPertanyaan);
+            formData.append('type', newType);
+            formData.append('category', newCategory);
+            
+            /*
+            const files = $('input[name="files[]"]')[0].files;
+            console.log(files);
+            if (files.length === 0) {
+                //Swal.fire('Error!', 'Please select at least one file.', 'error');
+                //return;
+            }
+            */
+            
+            files.each(function() {
+                const fileInput = this;
+                for (let i = 0; i < fileInput.files.length; i++) {
+                    formData.append('files[]', fileInput.files[i]);
+                }
+            });
+        
+            $.ajax({
+                url: "{% url 'pertanyaan_baku_data' %}",
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                data: formData,
+                processData: false, 
+                contentType: false, 
+                success: function(response) {
+                    if (response.success) {
+                        $('#ListTable').DataTable().ajax.reload();
+                        $('#editModal').modal('hide');
+                        Swal.fire('Ubah Data!', 'Data berhasil diubah.', 'success');
+                    } else {
+                        Swal.fire('Error!', 'Data gagal diubah.', 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error!', 'Data gagal diubah.', 'error');
+                }
+            });
+        });
+        
+    
+        // Event delegation for delete button
+        $('#ListTable tbody').on('click', '.btn-delete', function() {
+            const id = $(this).data('id');
+
+            // Store the ID in the hidden input field
+            $('#deleteId').val(id);
+            
+            // Show the delete confirmation modal
+            $('#deleteModal').modal('show');
+        });
+
+        // Confirm delete button in the modal
+        $('#confirmDelete').on('click', function() {
+            const id = $('#deleteId').val();
+
+            $.ajax({
+                url: "{% url 'pertanyaan_baku_data' %}",
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                data: {
+                    action: 'delete',
+                    id: id
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#ListTable').DataTable().ajax.reload(); // Refresh the table
+                        $('#deleteModal').modal('hide'); // Hide the modal
+                        Swal.fire(
+                            'Hapus Data!',
+                            'Data berhasil dihapus.',
+                            'success'
+                        );
+                    } else {
+                        //alert("An error occurred while deleting.");
+                        Swal.fire('Error!', 'Data gagal dihapus.', 'error');
+                    }
+                },
+                error: function() {
+                    //alert("An error occurred while deleting.");
+                    Swal.fire('Error!', 'Data gagal dihapus.', 'error');
+                }
+            });
+        });
+
+        // Event delegation for delete button
+        $('#filesTable tbody').on('click', '.btn-delete-file', function() {
+            const id = $(this).data('id');
+
+            // Store the ID in the hidden input field
+            $('#deleteId').val(id);
+            
+            // Show the delete confirmation modal
+            $('#filesModal').modal('hide');
+            $('#deleteModalFile').modal('show');
+        });
+
+        // Confirm delete button in the modal
+        $('#confirmDeleteFile').on('click', function() {
+            const id = $('#deleteId').val();
+
+            $.ajax({
+                url: "{% url 'filepertanyaaninstansi_data' %}",
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                data: {
+                    action: 'delete',
+                    id: id
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#ListTable').DataTable().ajax.reload(); // Refresh the table
+                        $('#deleteModalFile').modal('hide'); // Hide the modal
+                        Swal.fire(
+                            'Hapus Data!',
+                            'Data berhasil dihapus.',
+                            'success'
+                        );
+                    } else {
+                        //alert("An error occurred while deleting.");
+                        Swal.fire('Error!', 'Data gagal dihapus.', 'error');
+                    }
+                },
+                error: function() {
+                    //alert("An error occurred while deleting.");
+                    Swal.fire('Error!', 'Data gagal dihapus.', 'error');
+                }
+            });
+        });
+    
+        $('body').css('padding-right', '0');
+    }
+
+    // Handle the form submission
+    $('#pertanyaan').on('change', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+    
+        const pertanyaanId = $(this).val(); // Get current value from dropdown
+    
+        // Clear type and category only if filled
+        if (!pertanyaanId) {
+            if ($('#type').val()) {
+                $('#type').val('').trigger('change');
+            }
+            if ($('#category').val()) {
+                $('#category').val('').trigger('change');
+            }
+            $('#jawaban').html(""); // Clear jawaban if no pertanyaan selected
+            return;
+        }
+    
+        // AJAX request for pertanyaan data
+        $.ajax({
+            url: `{% url 'pertanyaan_data' %}?pertanyaan_id=${pertanyaanId}&category_pertanyaan=baku`, // Use template literals for cleaner URLs
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            data: {
+                category_pertanyaan: 'baku',
+            },
+            success: function(response) {
+                if (response.success) {
+                    const data = response.data[0];
+                    console.log(data.type);
+                    console.log(data.category);
+                    $('#type').val(data.type).trigger('change');
+                    $('#category').val(data.category).trigger('change');
+
+                    console.log('Type :'+$('#type').val());
+                    console.log('Category :'+$('#category').val());
+    
+                    if (data.type === 'multiple' || data.type === 'multi-select') {
+                        // Fetch choices for multiple/multi-select questions
+                        fetchChoices(pertanyaanId);
+                    } else {
+                        // Handle other question types
+                        renderSingleQuestion(data);
+                    }
+                } else {
+                    Swal.fire('Error!', response.message, 'error');
+                }
+            },
+            error: function() {
+                Swal.fire('Error!', 'Data gagal ditambahkan.', 'error');
+            }
+        });
+    
+        function fetchChoices(pertanyaanId) {
+            $.ajax({
+                url: `{% url 'pilihan_data' %}?pertanyaan_id=${pertanyaanId}`,
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                success: function(response) {
+                    if (response.success) {
+                        renderMultipleChoices(response.data);
+                    } else {
+                        Swal.fire('Error!', response.message, 'error');
+                    }
+                }
+            });
+        }
+    
+        function renderMultipleChoices(data) {
+            const typeLabels = {
+                multiple: 'Pilihan Ganda',
+                checkbox: 'Checkbox',
+                'multi-select': 'Pilih Banyak',
+            };
+    
+            let html = '';
+            const questions = {};
+    
+            data.forEach(function(item) {
+                const questionId = item.pertanyaan_id;
+    
+                if (!questions[questionId]) {
+                    questions[questionId] = {
+                        label: typeLabels[item.pertanyaan__type] || 'Tidak Diketahui',
+                        type: item.pertanyaan__type,
+                        options: []
+                    };
+                }
+    
+                questions[questionId].options.push({
+                    id: item.master_pilihan_id,
+                    name: item.master_pilihan_id__name,
+                    bobot: item.bobot
+                });
+            });
+    
+            Object.keys(questions).forEach(questionId => {
+                const question = questions[questionId];
+                let inputHtml = '';
+    
+                if (question.type === 'multiple' || question.type === 'multi-select') {
+                    inputHtml = question.options.map(option => `
+                        <div class="form-check">
+                            <input type="radio" name="jawaban-${questionId}" id="jawaban-${questionId}-${option.id}" value="${option.id}" class="form-check-input">
+                            <label class="form-check-label" for="jawaban-${questionId}-${option.id}">${option.name} (${option.bobot})</label>
+                        </div>
+                    `).join('');
+                }
+    
+                html += `<div class="form-group">
+                    <label>${question.label}</label>
+                    ${inputHtml}
+                </div>`;
+            });
+    
+            $('#jawaban').html(html);
+        }
+    
+        function renderSingleQuestion(data) {
+            const typeLabels = {
+                text: 'Teks',
+                'long-text': 'Teks Panjang',
+                date: 'Tanggal',
+                file: 'Unggah File',
+                rating: 'Rating',
+            };
+    
+            let html = '';
+    
+            const label = typeLabels[data.type] || 'Tidak Diketahui';
+            let inputHtml = '';
+    
+            switch (data.type) {
+                case 'text':
+                    inputHtml = `<input type="text" name="jawaban" id="jawaban-${data.id}" class="form-control">`;
+                    break;
+                case 'long-text':
+                    inputHtml = `<textarea name="jawaban" id="jawaban-${data.id}" class="form-control"></textarea>`;
+                    break;
+                case 'date':
+                    inputHtml = `<input type="date" name="jawaban" id="jawaban-${data.id}" class="form-control">`;
+                    break;
+                case 'file':
+                    inputHtml = `<input type="file" name="jawaban" id="jawaban-${data.id}" class="form-control">`;
+                    break;
+                case 'rating':
+                    inputHtml = `<select name="jawaban" id="jawaban-${data.id}" class="form-control select2bs4">
+                        <option value="">Pilih Rating</option>
+                        <option value="1">1 ⭐</option>
+                        <option value="2">2 ⭐⭐</option>
+                        <option value="3">3 ⭐⭐⭐</option>
+                        <option value="4">4 ⭐⭐⭐⭐</option>
+                        <option value="5">5 ⭐⭐⭐⭐⭐</option>
+                    </select>`;
+                    break;
+                default:
+                    break;
+            }
+    
+            html += `<div class="form-group">
+                <label>${label}</label>
+                ${inputHtml}
+            </div>`;
+    
+            $('#jawaban').html(html);
+        }
+      });
+
+    $(function () {
+      refresh();
+      //Initialize Select2 Elements
+      $('.select2').select2();
+
+      //Initialize Select2 Elements
+      $('.select2bs4').select2({
+        theme: 'bootstrap4'
+      });
+
+      $(document).on('click', '.btn-add', function() {
+        let form = $('#formSelected').val();
+        //let instansi = $('#instansiSelected').val();
+        
+        // Reset fields
+        $('#order').val(null);
+        $('#pertanyaan').val(null).trigger('change');
+        $('#type').val(null).trigger('change');
+        $('#category').val(null).trigger('change');
+        $('input[name="files[]"]').val('');
+    
+        // Check for required selections
+        if (!form) {
+            Swal.fire('Error!', 'Silahkan Pilih Formulir', 'error');
+            return;
+        }
+        
+        // Fetch selected data
+        fetchSelectedData('form', form, '{% url "form_data" %}', 'Formulir', null);
+        //fetchSelectedData('instansi', instansi, '{% url "instansi_data" %}', 'Instansi', null);
+    
+        // AJAX request for pertanyaan_baku_data
+        $.ajax({
+            url: "{% url 'pertanyaan_baku_data' %}?form_pertanyaan_baku=" + form + "&instansi_pertanyaan_baku=",
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            data: {
+                action: 'count'
+            },
+            success: function(response) {
+                let orderValue = 1; // Default order value
+    
+                if (response.success) {
+                    if (response.data && response.data.order !== undefined) {
+                        orderValue = parseInt(response.data.order) + 1 || 1; // Increment order or default to 1
+                    }
+                }
+                $('#order').val(orderValue);
+            },
+            error: function() {
+                console.log("Error occurred during AJAX request.");
+                $('#order').val("1"); // Fallback on error
+            }
+        });
+    
+        // Show the modal
+        $('#addModal').modal('show');
+    });
+    
+
+      $('#confirmAdd').on('click', function() {
+        $('#formSelected').val(null).trigger('change');
+        //$('#instansiSelected').val(null).trigger('change');
+        $('#addConfirmationModal').modal('hide');
+      });
+
+      $('#confirmNo').on('click', function() {
+        $('#addConfirmationModal').modal('hide');
+        let form = $('#formSelected').val();
+        //let instansi = $('#instansiSelected').val();
+        
+        // Reset fields
+        $('#order').val(null);
+        $('#pertanyaan').val(null).trigger('change');
+        $('#type').val(null).trigger('change');
+        $('#category').val(null).trigger('change');
+        $('input[name="files[]"]').val('');
+    
+        // Check for required selections
+        if (!form) {
+            Swal.fire('Error!', 'Silahkan Pilih Formulir', 'error');
+            return;
+        }
+        
+        // Fetch selected data
+        fetchSelectedData('form', form, '{% url "form_data" %}', 'Formulir', null);
+        //fetchSelectedData('instansi', instansi, '{% url "instansi_data" %}', 'Instansi', null);
+    
+        // AJAX request for pertanyaan_baku_data
+        $.ajax({
+            url: "{% url 'pertanyaan_baku_data' %}?form_pertanyaan_baku=" + form + "&instansi_pertanyaan_baku=",
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            data: {
+                action: 'count'
+            },
+            success: function(response) {
+                let orderValue = 1; // Default order value
+    
+                if (response.success) {
+                    if (response.data && response.data.order !== undefined) {
+                        orderValue = parseInt(response.data.order) + 1 || 1; // Increment order or default to 1
+                    }
+                }
+                $('#order').val(orderValue);
+            },
+            error: function() {
+                console.log("Error occurred during AJAX request.");
+                $('#order').val("1"); // Fallback on error
+            }
+        });
+    
+        // Show the modal
+        $('#addModal').modal('show');
+      });
+
+      $('#formSelected').select2({
+        theme: 'bootstrap4',
+        ajax: {
+            url: '{% url "form_data" %}',
+            type: 'POST', // Use POST method
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            dataType: 'json',
+            delay: 250,
+    
+            // Function to handle the request parameters
+            data: function(params) {
+                return {
+                    action: 'select', // Corrected the key from 'acction' to 'action'
+                    q: params.term   // Include the search term
+                };
+            },
+    
+            processResults: function(data) {
+                return {
+                    results: data.results // Ensure this matches the format of your response
+                };
+            }
+        },
+        //minimumInputLength: 1, // Minimum characters before triggering AJAX
+        placeholder: 'Pilih Formulir',
+        allowClear: true // Allow clearing of the selection
+      });
+
+      /*
+      $('#instansiSelected').select2({
+        theme: 'bootstrap4',
+        ajax: {
+            url: '{% url "instansi_data" %}',
+            type: 'POST', // Use POST method
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            dataType: 'json',
+            delay: 250,
+    
+            // Function to handle the request parameters
+            data: function(params) {
+                return {
+                    action: 'select', // Corrected the key from 'acction' to 'action'
+                    q: params.term,   // Include the search term
+                };
+            },
+    
+            processResults: function(data) {
+                return {
+                    results: data.results // Ensure this matches the format of your response
+                };
+            }
+        },
+        minimumInputLength: 1, // Minimum characters before triggering AJAX
+        placeholder: 'Pilih Instansi',
+        allowClear: true // Allow clearing of the selection
+      });
+      */
+
+      $('#form').select2({
+        theme: 'bootstrap4',
+        ajax: {
+            url: '{% url "form_data" %}',
+            type: 'POST', // Use POST method
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            dataType: 'json',
+            delay: 250,
+    
+            // Function to handle the request parameters
+            data: function(params) {
+                return {
+                    action: 'select', // Corrected the key from 'acction' to 'action'
+                    q: params.term   // Include the search term
+                };
+            },
+    
+            processResults: function(data) {
+                return {
+                    results: data.results // Ensure this matches the format of your response
+                };
+            }
+        },
+        //minimumInputLength: 1, // Minimum characters before triggering AJAX
+        placeholder: 'Pilih Formulir',
+        allowClear: true // Allow clearing of the selection
+      });
+
+      /*
+      $('#instansi').select2({
+        theme: 'bootstrap4',
+        ajax: {
+            url: '{% url "instansi_data" %}',
+            type: 'POST', // Use POST method
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            dataType: 'json',
+            delay: 250,
+    
+            // Function to handle the request parameters
+            data: function(params) {
+                return {
+                    action: 'select', // Corrected the key from 'acction' to 'action'
+                    q: params.term,   // Include the search term
+                };
+            },
+    
+            processResults: function(data) {
+                return {
+                    results: data.results // Ensure this matches the format of your response
+                };
+            }
+        },
+        minimumInputLength: 1, // Minimum characters before triggering AJAX
+        placeholder: 'Pilih Instansi',
+        allowClear: true // Allow clearing of the selection
+      });
+      */
+
+      $('#pertanyaan').select2({
+        theme: 'bootstrap4',
+        ajax: {
+            url: '{% url "pertanyaan_data" %}?category_pertanyaan=baku',
+            type: 'POST', // Use POST method
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            dataType: 'json',
+            delay: 250,
+    
+            // Function to handle the request parameters
+            data: function(params) {
+                return {
+                    action: 'select', // Corrected the key from 'acction' to 'action'
+                    q: params.term,   // Include the search term
+                    category_pertanyaan: 'baku'
+                };
+            },
+    
+            processResults: function(data) {
+                return {
+                    results: data.results // Ensure this matches the format of your response
+                };
+            }
+        },
+        //minimumInputLength: 1, // Minimum characters before triggering AJAX
+        placeholder: 'Pilih Pertanyaan',
+        allowClear: true // Allow clearing of the selection
+      });
+    });
+
+    $(document).ready(function() {
+        // Disable file input initially
+        
+        $('#addFileButton').prop('disabled', true);
+        $('input[name="files[]"]').prop('disabled', true);
+
+        // Enable file input when a question is selected
+        $('#pertanyaan').on('change', function() {
+            if ($(this).val()) {
+                
+                $('#addFileButton').prop('disabled', false);
+                $('input[name="files[]"]').prop('disabled', false);
+            } else {
+                
+                $('#addFileButton').prop('disabled', true);
+                $('input[name="files[]"]').prop('disabled', true);
+            }
+        });
+
+        // Handle the form submission
+        $('#addForm').on('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+            
+            // Validate required fields
+            const type = $('#type').val();
+            const category = $('#category').val();
+    
+            if (!type) {
+                Swal.fire('Error!', 'Silahkan isikan Jenis', 'error');
+                return; // Prevent submission if validation fails
+            }
+    
+            if (!category) {
+                Swal.fire('Error!', 'Silahkan isikan Kategori', 'error');
+                return; // Prevent submission if validation fails
+            }
+    
+            const formData = new FormData(this); // Create a FormData object from the form
+            formData.append('action', 'add'); // Append the action field to the FormData
+    
+            // Log field values for debugging
+            console.log('Type:', type);
+            console.log('Category:', category);
+    
+            $.ajax({
+                url: "{% url 'pertanyaan_baku_data' %}",
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                data: formData,
+                processData: false, // Tell jQuery not to process the data
+                contentType: false, // Tell jQuery not to set contentType
+                success: function(response) {
+                    if (response.success) {
+                        $('#addModal').modal('hide'); // Hide the modal
+                        $('#ListTable').DataTable().ajax.reload(); // Refresh the table
+                        Swal.fire(
+                            'Tambah Data!',
+                            'Data berhasil ditambahkan.',
+                            'success'
+                        );
+                        $('#addConfirmationModal').modal('show');
+                    } else {
+                        Swal.fire(
+                            'Error!',
+                            response.message,
+                            'error'
+                        );
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Improved error handling
+                    const errorMessage = xhr.responseJSON?.message || 'Data gagal ditambahkan.';
+                    Swal.fire(
+                        'Error!',
+                        errorMessage,
+                        'error'
+                    );
+                }
+            });
+        });
+    });
+    
+    $(document).on('click', '.btn-deactivate', function() {
+        const userId = $(this).data('id');
+    
+        // Confirm deactivation action
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: "Anda yakin ingin menonaktifkan {{ title }} ini?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, nonaktifkan!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // AJAX call to deactivate user
+                $.ajax({
+                    url: '{% url 'pertanyaan_baku_data' %}',  // Update to your URL
+                    type: 'POST',
+                    data: {
+                        action: 'deactive',
+                        id: userId,
+                        active: false,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'  // Include CSRF token if needed
+                    },
+                    success: function(response) {
+                        Swal.fire('Berhasil!', '{{ title }} telah dinonaktifkan.', 'success');
+                        // Optionally, reload the DataTable to reflect changes
+                        $('#ListTable').DataTable().ajax.reload();
+                    },
+                    error: function(xhr) {
+                        Swal.fire('Gagal!', 'Terjadi kesalahan: ' + xhr.responseText, 'error');
+                    }
+                });
+            }
+        });
+    });
+
+    $(document).on('click', '.btn-activate', function() {
+        const userId = $(this).data('id');
+    
+        // Confirm deactivation action
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: "Anda yakin ingin mengaktifkan {{ title }} ini?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, aktifkan!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '{% url 'pertanyaan_baku_data' %}',  // Update to your URL
+                    type: 'POST',
+                    data: {
+                        action: 'active',
+                        id: userId,
+                        active: true,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'  // Include CSRF token if needed
+                    },
+                    success: function(response) {
+                        Swal.fire('Berhasil!', '{{ title }} telah diaktifkan.', 'success');
+                        // Optionally, reload the DataTable to reflect changes
+                        $('#ListTable').DataTable().ajax.reload();
+                    },
+                    error: function(xhr) {
+                        Swal.fire('Gagal!', 'Terjadi kesalahan: ' + xhr.responseText, 'error');
+                    }
+                });
+            }
+        });
+    });
+    
+    // Event delegation for view files button
+    $('#ListTable tbody').on('click', '.btn-view-files', function() {
+        const id = $(this).data('id');
+
+        // Initialize the files DataTable
+        $('#filesTable').DataTable({
+            'bDestroy': true,
+            'processing': true,
+            'ajax': {
+                url: "{% url 'filepertanyaaninstansi_data' %}?pertanyaan_instansi_id=" + id, // Update with your URL
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            },
+            'columns': [
+                { data: 'no', title: 'No', className: "text-center" },
+                { data: 'original_filename', title: 'Nama File', className: "text-left" }, // Ensure your backend returns 'file_name'
+                {
+                    data: null,
+                    title: '#',
+                    className: "text-center",
+                    render: function(data, type, row) {
+                        const deleteButton = row.deleted_at ? '' : `
+                            <button class="btn btn-danger btn-delete-file" data-id="${row.id}" title="Hapus Data"><i class="fa fa-times"></i></button>
+                        `;
+                        return `
+                            <a href="/kla/kla-data/${row.encrypted_filename}" class="btn btn-success" target="_blank"><i class="fa fa-download"></i></a>
+                            ${deleteButton}
+                        `;
+                    }
+                }
+            ]
+        });
+
+        // Show the modal
+        $('#filesModal').modal('show');
+    });
+  </script>
+  <!-- Custome JS -->
+{% endblock  %}

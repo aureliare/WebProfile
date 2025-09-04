@@ -1,0 +1,158 @@
+{% load static %}
+<!-- Main Sidebar Container -->
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="{% url 'user_dashboard' %}" class="brand-link">
+        <img src="{% static 'adminlte/default/logo_bekasi.png' %}" alt="Bekasikab" class="brand-image img-circle elevation-3" style="opacity: .8">
+        <span class="brand-text font-weight-light">KLA</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+
+        <!-- SidebarSearch Form -->
+        {% comment %} 
+        <div class="form-inline">
+            <div class="input-group" data-widget="sidebar-search">
+                <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
+                <div class="input-group-append">
+                    <button class="btn btn-sidebar">
+                        <i class="fas fa-search fa-fw"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endcomment %}
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <li class="nav-item menu-open">
+                    <a href="{% url user.role|add:'_dashboard' %}" class="nav-link active">
+                        <i class="nav-icon fas fa-home"></i>
+                        <p>Dashboard</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <p>
+                            EVALUASI KABUPATEN LAYAK ANAK
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        {% if request.user.role == 'user' or request.user.role == 'operator' %}
+                        <li class="nav-item">
+                            <a href="{% url user.role|add:'_data_spesifik' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>DATA SPESIFIK KABUPATEN LAYAK ANAK</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url user.role|add:'_data_baku' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>DATA BAKU KABUPATEN LAYAK ANAK</p>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="nav-item">
+                            <a href="{% url user.role|add:'_data_general' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>DATA GENERAL KABUPATEN LAYAK ANAK</p>
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a href="{% url user.role|add:'_hasil_akumulasi' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>{% if user.role in "user,operator" %}HASIL {% endif %}AKUMULASI DATA</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url user.role|add:'_penilaian_perangkat_daerah' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>{% if user.role in "user,operator" %}HASIL {% endif %}PENILAIAN PERANGKAT DAERAH</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                {% if user.role == 'admin' %}
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <p>
+                            Master
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{% url 'pengguna_list' %}" class="nav-link {% if request.path == '/kla/admin/pengguna/' %}active{% endif %}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Pengguna</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'instansi_list' %}" class="nav-link {% if request.path == '/kla/admin/instansi/' %}active{% endif %}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Instansi</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url "masterpilihan_list" %}" class="nav-link {% if request.path == '/kla/admin/master_pilihan/' %}active{% endif %}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Master Pilihan</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url "pertanyaan_list" %}" class="nav-link {% if request.path == '/kla/admin/pertanyaan/' %}active{% endif %}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Pertanyaan</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url "pilihan_list" %}" class="nav-link {% if request.path == '/kla/admin/pilihan/' %}active{% endif %}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Pilihan Pertanyaan</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url "form_list" %}" class="nav-link {% if request.path == '/kla/admin/form/' %}active{% endif %}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Form</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url "pertanyaan_baku_list" %}" class="nav-link {% if request.path == '/kla/admin/pertanyaan_baku/' %}active{% endif %}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Pertanyaan Baku</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url "pertanyaan_spesifik_list" %}" class="nav-link {% if request.path == '/kla/admin/pertanyaan_spesifik/' %}active{% endif %}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Pertanyaan Spesifik</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url "buku_panduan_list" %}" class="nav-link {% if request.path == '/kla/admin/buku_panduan_spesifik/' %}active{% endif %}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Buku Panduan</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url "petunjuk_teknis_list" %}" class="nav-link {% if request.path == '/kla/admin/petunjuk_teknis_spesifik/' %}active{% endif %}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Petunjuk Teknis</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+
+    </div>
+    <!-- /.sidebar -->
+</aside>

@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+{% endblock  %}
+
+
+{% block content %}
+  {% include "components/_navbar.html" %}
+  {% include "components/_main_sidebar_container.html" %}
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0"></h1>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-12">
+            <div class="small-box">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-info">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /.content -->
+     
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <section class="col-lg-12 connectedSortable">
+            <!-- Custom tabs (Charts with tabs)-->
+            <div class="card">
+              <div class="card-body">
+                <div class="tab-content p-0 text-right">
+                  <!-- Contoh penggunaan dalam template -->
+                   <input type="hidden" name="instansi" id="instansi" value="{{ request.GET.instansi }}">
+                  <h4 class="btn btn-primary" onclick="nextPage()">LANJUT<div id="instansi_name"></div></h4>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                      <div class="container">
+                        <div class="form-group row">
+                          <label for="instansiSelected" class="col-sm-2 col-form-label">INSTANSI</label>
+                          <div class="col-sm-10">
+                            <select class="form-control" id="instansiSelected" name="instansiSelected" required>
+                            </select>
+                            <input type="hidden" name="user" id="user" class="form-control">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="container">
+                        <div class="form-group row">
+                          <label for="typeSelected" class="col-sm-2 col-form-label">JENIS DATA</label>
+                          <div class="col-sm-10">
+                            <select class="form-control select2bs4" id="typeSelected" name="typeSelected" required>
+                              <option value="">PILIH JENIS DATA</option>
+                              <option value="spesifik">SPESIFIK</option>
+                              <option value="baku">BAKU</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="container">
+                        <div class="form-group row">
+                          <label for="yearSelected" class="col-sm-2 col-form-label">TAHUN</label>
+                          <div class="col-sm-10">
+                            <select class="form-control" id="yearSelected" name="yearSelected" required>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!-- /.content-wrapper -->
+{% endblock %}
+
+{% block js %}
+<!-- datatables -->
+<script src="{% static "adminlte/plugins/datatables/jquery.dataTables.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-responsive/js/dataTables.responsive.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-responsive/js/responsive.bootstrap4.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-buttons/js/dataTables.buttons.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-buttons/js/buttons.bootstrap4.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/jszip/jszip.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/pdfmake/pdfmake.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/pdfmake/vfs_fonts.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-buttons/js/buttons.html5.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-buttons/js/buttons.print.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-buttons/js/buttons.colVis.min.js" %}"></script>
+
+<!-- Include SweetAlert2 CSS and JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+<!-- selet2 -->
+<script src="{% static "adminlte/plugins/select2/js/select2.full.min.js" %}"></script>
+
+
+<script>
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+          if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+            // Only send the token to relative URLs i.e. locally.
+            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+          }
+        }
+      });
+      
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Check if this cookie string begins with the name we want
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+      
+</script>
+
+  <!-- Custome JS -->
+  <script>
+    $(document).on("keyup",".trim", function () {
+      if (this.value != this.value.replace(/\s/g, '')) {
+        this.value = this.value.replace(/\s/g, '');
+      }
+    });
+  </script>
+
+  <script>
+    function fetchSelectedData(element, id, url, defaultValue, param) {
+      $.ajax({
+          url: url, // Ensure this URL is correct
+          type: 'POST',
+          headers: {
+              'X-CSRFToken': getCookie('csrftoken')
+          },
+          data: {
+              action: 'select', // Adjust as needed
+              form_id: id, // Send the form ID if necessary
+              jawaban: 'GET' // Send the form ID if necessary
+          },
+          success: function(data) {
+              // Map the data to the expected format
+              const options = data.results.map(item => ({
+                  id: item.id, // Use the appropriate field name for ID
+                  text: item.text, // Use the appropriate field name for text
+                  user: item.user
+              }));
+  
+              // Initialize select2 on the specified element
+              $('#' + element).select2({
+                  data: options,
+                  theme: 'bootstrap4',
+                  //minimumInputLength: 1, // Minimum characters before triggering AJAX
+                  placeholder: 'PILIH '+defaultValue,
+                  allowClear: true // Allow clearing of the selection
+              });
+  
+              // Set the value of the select2 element based on the form ID
+              $('#' + element).val(id).trigger('change');
+
+              // Event listener for change
+              if(element === 'instansiSelected'){
+                $('#' + element).on('change', function() {
+                  const selectedData = $(this).select2('data')[0]; // Ambil data yang dipilih
+                  if (selectedData) {
+                      const userId = selectedData.user; // Ambil ID pengguna dari data
+                      // Lakukan sesuatu dengan userId, misalnya set ke elemen lain
+                      $('#user').val(userId); // Asumsi ada elemen input dengan ID 'user'
+                  }
+                });
+              }
+          },
+          error: function(xhr) {
+              console.error('Error:', xhr);
+          }
+      });
+    }
+    function refresh(){
+      fetchSelectedData('instansiSelected',0,'{% url "instansi_data" %}','INSTANSI',null);
+      fetchSelectedData('yearSelected',0,'{% url "tahun_data" %}','TAHUN',null);
+    }
+
+    function nextPage() {  
+      // Validasi: Pastikan semua isian diisi
+      var instansi = $('#instansiSelected').val();
+      var user = $('#user').val();
+      var type = $('#typeSelected').val();
+      var year = $('#yearSelected').val();
+  
+      // Cek apakah semua isian diisi
+      if (!instansi || !user || !type || !year) {
+          Swal.fire({
+              icon: 'warning',
+              title: 'Peringatan',
+              text: 'Silakan isi semua isian sebelum melanjutkan.',
+          });
+          return; // Hentikan eksekusi jika ada isian yang kosong
+      }
+  
+      // Build URL
+      var url = "{% url user.role|add:'_data_general_detail' %}?instansi=" + encodeURIComponent(instansi) + "&type=" + encodeURIComponent(type) + "&year=" + encodeURIComponent(year) + "&user=" + encodeURIComponent(user);
+  
+      // Redirect
+      window.location = url;
+    }
+
+    $(function () {
+      refresh()
+      //Initialize Select2 Elements
+      $('.select2').select2();
+
+      //Initialize Select2 Elements
+      $('.select2bs4').select2({
+        theme: 'bootstrap4'
+      })
+    });
+  </script>
+{% endblock  %}
+

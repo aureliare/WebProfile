@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+{% endblock  %}
+
+
+{% block content %}
+  {% include "components/_navbar.html" %}
+  {% include "components/_main_sidebar_container.html" %}
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0"></h1>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-12">
+            <div class="small-box">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-info">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /.content -->
+     
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <section class="col-lg-12 connectedSortable">
+            <!-- Custom tabs (Charts with tabs)-->
+            <div class="card">
+              <div class="card-body">
+                <div class="tab-content p-0 text-center">
+                  <!-- Contoh penggunaan dalam template -->
+                  <h4>KEBUTUHAN DATA SPESIFIK KABUPATEN BEKASI LAYAK ANAK</h4>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="row">
+            <section class="col-lg-12 connectedSortable">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="tab-content p-0 text-center">
+                            {% for pertanyaan_instansi in page_obj %}
+                                <div class="text-left">
+                                    {% if pertanyaan_instansi.pertanyaan %}
+                                        <form method="POST" action="#">  <!-- Ganti dengan URL yang sesuai untuk memproses jawaban -->
+                                            {% csrf_token %}
+                                            <input type="hidden" id="id" name="id" class="form-control">
+                                            <div class="row">
+                                                <div class="col-6"></div>
+                                                <div class="col-3">
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <div class="tab-content p-0 text-center">
+                                                                Nilai EM = 0
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-3">
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <div class="tab-content p-0 text-center">
+                                                                Nilai Maksimal = 0
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <h5>{{ pertanyaan_instansi.order }}. {{ pertanyaan_instansi.pertanyaan.name }}</h5>
+                                                <p>Jawaban:</p>
+                                                {% comment %} {% for pilihan in pertanyaan_instansi.pertanyaan.pilihan.all %}
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="pilihan" id="pilihan_{{ pilihan.id }}" value="{{ pilihan.id }}">
+                                                        <label class="form-check-label" for="pilihan_{{ pilihan.id }}">
+                                                            {{ pilihan.master_pilihan.name }} (Bobot: {{ pilihan.bobot }})
+                                                        </label>
+                                                    </div>
+                                                {% empty %}
+                                                    <p>Tidak ada pilihan tersedia.</p>
+                                                {% endfor %} {% endcomment %}
+                                                {% for pilihan in pertanyaan_instansi.pertanyaan.pilihan.all %}
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="pilihan" id="pilihan_{{ pilihan.id }}" value="{{ pilihan.id }}">
+                                                        <label class="form-check-label" for="pilihan_{{ pilihan.id }}">
+                                                            {{ pilihan.master_pilihan.name }}
+                                                        </label>
+                                                    </div>
+                                                {% empty %}
+                                                    <p>Tidak ada pilihan tersedia.</p>
+                                                {% endfor %}
+
+                                                <p>Catatan : {{ pertanyaan_instansi.pertanyaan.description }}</p>
+
+                                                {% comment %} <ul>
+                                                    {% for file in pertanyaan_instansi.files_pertanyaan_instansi.all %}
+                                                        <li><a href="/kla/kla-data/{{ file.encrypted_filename }}">{{ file.original_filename }}</a> (Ukuran: {{ file.size }} bytes)</li>
+                                                    {% empty %}
+                                                        <li>Tidak ada file tersedia.</li>
+                                                    {% endfor %}
+                                                </ul> {% endcomment %}
+
+                                                {% for file in pertanyaan_instansi.files_pertanyaan_instansi.all %}
+                                                    <a href="/kla/kla-data/{{ file.encrypted_filename }}">Download Matriks</a>
+                                                {% empty %}
+                                                    Tidak ada file tersedia.
+                                                {% endfor %}
+                                                    
+                                                <input type="file" class="form-control">
+                                                <div class="row mt-5">
+                                                    <section class="col-lg-12 connectedSortable">
+                                                        <div class="card">
+                                                            <div class="card-body">
+                                                                <div class="tab-content p-0 text-center">
+                                                                    <p class="text-left">Penjelasan Data Pendukung :</p>
+                                                                    <textarea class="form-control" rows="10"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </section>
+                                                </div>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Simpan</button>
+                                        </form>                                        
+                                    {% else %}
+                                        <h3>No Pertanyaan available</h3>
+                                    {% endif %}
+                                    <p>{{ pertanyaan.content }}</p>
+                                </div>
+                            {% empty %}
+                                <p>Tidak ada data yang tersedia.</p>
+                            {% endfor %}
+        
+                            <div class="pagination">
+                                <nav aria-label="Page navigation">
+                                    <ul class="pagination justify-content-between">
+                                        {% if page_obj.has_previous %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=1" aria-label="Pertama">
+                                                    <span aria-hidden="true">&laquo; Pertama</span>
+                                                </a>
+                                            </li>
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Sebelumnya">
+                                                    <span aria-hidden="true">Sebelumnya</span>
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                            
+                                        <li class="page-item disabled">
+                                            <span class="page-link">
+                                                Halaman {{ page_obj.number }} dari {{ page_obj.paginator.num_pages }}.
+                                            </span>
+                                        </li>
+                            
+                                        {% if page_obj.has_next %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Selanjutnya">
+                                                    <span aria-hidden="true">Selanjutnya</span>
+                                                </a>
+                                            </li>
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Terakhir">
+                                                    <span aria-hidden="true">Terakhir &raquo;</span>
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </nav>
+                            </div>                            
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        
+        {% comment %} 
+        <div class="row" style="margin-top: 380px;">
+          <section class="col-lg-12 connectedSortable">
+            <!-- Custom tabs (Charts with tabs)-->
+            <div class="card">
+              <div class="card-body">
+                <div class="tab-content p-0 text-center">
+                  <h4>Panduan bisa didownload di sini : <a href="#">download panduan</a></h4>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="row">
+          <section class="col-lg-12 connectedSortable">
+            <!-- Custom tabs (Charts with tabs)-->
+            <div class="card">
+              <div class="card-body">
+                <div class="tab-content p-0 text-center">
+                  <h4>
+                    Pemerintah Daerah Berkewajiban dan Bertanggungjawab untuk melaksanakan dan mendukung kebijakan nasional dalam penyelenggaraan Perlindungan Anak melalui upaya daerah membangun Kabupaten/Kota Layak Anak (KLA)
+                  </h4>
+                  <br><br><br><br>
+                  <h6>
+                    Pasal 21 UU No 35 Tahun 2014 tentang Perubahan Atas UU No 23 Tahun 2002 tentang Perlindungan Anak
+                  </h6>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div> {% endcomment %}
+      </div>
+    </section>
+  </div>
+  <!-- /.content-wrapper -->
+
+{% endblock %}
+
+{% block js %}
+{% endblock  %}
+

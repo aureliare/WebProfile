@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+{% endblock  %}
+
+
+{% block content %}
+  {% include "components/_navbar.html" %}
+  {% include "components/_main_sidebar_container.html" %}
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0">{{ title }}</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">{{ request.user.role|capfirst }}</a></li>
+              <li class="breadcrumb-item active">{{ title }}</li>
+            </ol>
+          </div><!-- /.col -->
+        </div>
+      </div>
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-12">
+            <div class="small-box">
+                {% comment %} {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-info">{{ message }}</div>
+                    {% endfor %}
+                {% endif %} {% endcomment %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /.content -->
+     
+    <section class="content">
+      <div class="container-fluid">
+        <h1>{{ title }}</h1>
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+            <div class="col-lg-12">
+                {% if notifikasi %}
+                    {% for notif in notifikasi %}
+                        <div class="card notification-card">
+                            <div class="card-header">
+                                <h5 class="card-title">{{ notif.type }}</h5>
+                                {% comment %} <span class="badge {{ 'bg-danger' if not notif.is_read else 'bg-success' }}">
+                                    {{ 'Belum dibaca' if not notif.is_read else 'Dibaca' }}
+                                </span> {% endcomment %}
+                            </div>
+                            <div class="card-body">
+                                <p>{{ notif.created_at|date:"F j, Y, g:i a" }}</p>
+                                <p>{{ notif.jawaban.text_jawaban }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info text-center">Tidak ada notifikasi.</div>
+                {% endif %}
+            </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!-- /.content-wrapper -->
+{% endblock %}
+
+{% block js %}
+{% endblock  %}

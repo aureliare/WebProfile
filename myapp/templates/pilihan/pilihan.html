@@ -1,0 +1,1203 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock  %}
+
+
+{% block content %}
+  {% include "components/_navbar.html" %}
+  {% include "components/_main_sidebar_container.html" %}
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0">{{ title }}</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Admin</a></li>
+              <li class="breadcrumb-item active">{{ title }}</li>
+            </ol>
+          </div><!-- /.col -->
+        </div>
+      </div>
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-12">
+            <div class="small-box">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-info">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /.content -->
+     
+    <section class="content">
+      <div class="container-fluid">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addModal">
+                            <i class="fa fa-plus"></i> {{ title }}
+                        </button>                        
+                    </div>
+                    <div class="card-body">                        
+                        <div class="row">
+                            <div class="col-lg-4 form-group d-none">
+                                <label for="indikator">Indikator</label>
+                                <select name="indikator" id="indikator" class="form-control select2bs4" onchange="refresh()">
+                                  <option value="">Pilih</option>
+                                </select>
+                              </div>
+                              <div class="col-lg-2 form-group d-none">
+                                <label for="level">Level</label>
+                                <select name="level" id="level" class="form-control select2bs4" onchange="refresh()">
+                                  <option value="">Pilih</option>
+                                </select>
+                              </div>
+                              <div class="col-lg-2 form-group d-none">
+                                <label for="pengampu">Pengampu</label>
+                                <select name="pengampu" id="pengampu" class="form-control select2bs4" onchange="refresh()">
+                                  <option value="">Pilih</option>
+                                </select>
+                              </div>
+                              <div class="col-lg-2 form-group d-none">
+                                <label for="status">Status</label>
+                                <select name="status" id="status" class="form-control select2bs4" onchange="refresh()">
+                                  <option value="">Pilih</option>
+                                </select>
+                              </div>
+                              <div class="table-responsive">
+                                <table id="ListTable" class="table table-bordered table-hover table-striped" width="100%">
+                                  <thead>
+                                    <tr>
+                                      <td>No</td>
+                                      <td>ID</td>
+                                      <td>Pertanyaan</td>
+                                      <td>Pilihan</td>
+                                      <td>Bobot</td>
+                                      <td>Urutan</td>
+                                      <td>#</td>
+                                    </tr>
+                                  </thead>
+                                  <tbody></tbody>
+                                  <tfoot></tfoot>
+                                </table>
+                              </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!-- /.content-wrapper -->
+   
+
+<!-- Add Pilihan Pertanyaan Modal -->
+<div class="modal fade" id="addModalQuestion" tabindex="" role="dialog" aria-labelledby="addQuestionLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addQuestionLabel">Tambah Pertanyaan</h5>
+                {% comment %} <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button> {% endcomment %}
+                <button type="button" class="close" id="closeModalQuestion">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addFormQuestion">
+                    <input type="hidden" name="refModalQuestion" id="refModalQuestion" class="form-control">
+                    <div class="form-group">
+                        <label for="name">Nama</label>
+                        <textarea class="form-control" id="name" name="name" rows="4" required oninvalid="this.setCustomValidity('Silahkan isikan Nama')" oninput="this.setCustomValidity('')"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="type">Jenis</label>
+                        <select name="type" id="type" class="form-control select2bs4" required oninvalid="this.setCustomValidity('Silahkan isikan Jenis')" oninput="this.setCustomValidity('')">
+                            <option value="">Pilih Jenis</option>
+                            <option value="multiple">Pilihan Ganda</option>
+                            <option value="long-text">Teks Panjang</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Kategori</label>
+                        <select name="category" id="category" class="form-control select2bs4" required oninvalid="this.setCustomValidity('Silahkan isikan Kategori')" oninput="this.setCustomValidity('')">
+                            <option value="">Pilih Kategori</option>
+                            <option value="baku">Baku</option>
+                            <option value="spesifik">Spesifik</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Penjelasan</label>
+                        <textarea class="form-control" id="description" name="description" rows="10" required oninvalid="this.setCustomValidity('Silahkan isikan Penjelasan')" oninput="this.setCustomValidity('')"></textarea>
+                    </div>
+                    <div class="form-group d-none">
+                        <label for="evaluation_note">Penjelasan</label>
+                        <textarea class="form-control" id="evaluation_note" name="evaluation_note" rows="10"></textarea>
+                    </div>
+                    <div class="form-group d-none" id="fileUploadContainer">
+                        <label>Upload File</label>
+                        <div class="d-flex align-items-center">
+                            <div class="file-input flex-grow-1">
+                                <input type="file" name="files[]" class="form-control col form-control-file">
+                                <button type="button" class="col btn btn-danger remove-file" style="display:none;">-</button>
+                            </div>
+                            <button type="button" class="col btn btn-secondary ml-2" id="addFileButton">+</button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+  <!-- Add Master Pilihan Modal -->
+  <div class="modal fade" id="addModalChoice" tabindex="-1" role="dialog" aria-labelledby="addModalChoiceLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addModalChoiceLabel">Tambah Master Pilihan</h5>
+                {% comment %} <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button> {% endcomment %}
+                <button type="button" class="close" id="closeModalChoice">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addFormChoice">
+                    <input type="hidden" name="refModalChoice" id="refModalChoice" class="form-control">
+                    <div class="form-group">
+                        <label for="name">Nama</label>
+                        <input type="text" class="form-control" id="name" name="name" required oninvalid="this.setCustomValidity('Silahkan isikan Nama')" oninput="this.setCustomValidity('')">
+                    </div>
+                    <div class="form-group">
+                        <label for="bobot">Bobot</label>
+                        <input type="number" class="form-control" id="bobot" name="bobot" required oninvalid="this.setCustomValidity('Silahkan isikan Bobot')" oninput="this.setCustomValidity('')">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+  <!-- Add Pilihan Pertanyaan Modal -->
+<div class="modal fade" id="addModal" tabindex="" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addModalLabel">Tambah {{ title }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addForm">
+                    <div class="form-group">
+                        <div class="form-group">
+                            <label for="category_pertanyaan">Kategori</label>
+                            <select name="category_pertanyaan" id="category_pertanyaan" class="form-control select2bs4" required oninvalid="this.setCustomValidity('Silahkan isikan Kategori')" oninput="this.setCustomValidity('')">
+                                <option value="">Pilih Kategori</option>
+                                <option value="baku">Baku</option>
+                                <option value="spesifik">Spesifik</option>
+                            </select>
+                        </div>
+                        <label for="pertanyaan">Pertanyaan</label>
+                        <select name="pertanyaan" id="pertanyaan" class="form-control select2bs4" required oninvalid="this.setCustomValidity('Silahkan isikan Pertanyaan')" oninput="this.setCustomValidity('')">
+                            <option value="">Pilih Pertanyaan</option>
+                            {% comment %} {% for item in pertanyaan %}
+                                <option value="{{ item.id }}">{{ item.name }}</option>  <!-- Adjust the fields as necessary -->
+                            {% endfor %} {% endcomment %}
+                        </select>
+                    </div>
+                    <div class="form-group text-right">
+                        <label for="addQuestionBtn"></label>
+                        <button type="button" class="btn btn-primary" onclick="openQuestion(1)">
+                            <i class="fa fa-plus"> Pertanyaan</i>
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <label for="pilihan">Pilihan</label>
+                        <select name="pilihan" id="pilihan" class="form-control select2bs4" required oninvalid="this.setCustomValidity('Silahkan isikan Pilihan')" oninput="this.setCustomValidity('')">
+                            <option value="">Pilih Pilihan</option>
+                            {% for item in masterpilihan %}
+                                <option value="{{ item.id }}">{{ item.name }} bobot {{ item.bobot }}</option>  <!-- Adjust the fields as necessary -->
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group text-right">
+                        <label for="addChoiceBtn"></label>
+                        <button type="button" class="btn btn-primary" onclick="openChoice(1)">
+                            <i class="fa fa-plus"> Pilihan</i>
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <label for="bobot_pilihan">Bobot</label>
+                        <input type="number" class="form-control" id="bobot_pilihan" name="bobot_pilihan" required oninvalid="this.setCustomValidity('Silahkan isikan Bobot')" oninput="this.setCustomValidity('')">
+                    </div>
+                    <div class="form-group">
+                        <label for="order">Urutan</label>
+                        <input type="number" class="form-control" id="order" name="order" required oninvalid="this.setCustomValidity('Silahkan isikan Urutan')" oninput="this.setCustomValidity('')">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+  <!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Ubah {{ title }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <div class="form-group">
+                        <label for="editCategory_pertanyaan">Kategori</label>
+                        <select name="editCategory_pertanyaan" id="editCategory_pertanyaan" class="form-control select2bs4" required oninvalid="this.setCustomValidity('Silahkan isikan Kategori')" oninput="this.setCustomValidity('')">
+                            <option value="">Pilih Kategori</option>
+                            <option value="baku">Baku</option>
+                            <option value="spesifik">Spesifik</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPertanyaan">Pertanyaan</label>
+                        <select name="editPertanyaan" id="editPertanyaan" class="form-control select2bs4" required oninvalid="this.setCustomValidity('Silahkan isikan Pertanyaan')" oninput="this.setCustomValidity('')">
+                            <option value="">Pilih Pertanyaan</option>
+                            {% for item in pertanyaan %}
+                                <option value="{{ item.id }}">{{ item.name }} jenis {{ item.type }}</option>  <!-- Adjust the fields as necessary -->
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group text-right">
+                        <label for="addQuestionBtn"></label>
+                        <button type="button" class="btn btn-primary" onclick="openQuestion(2)">
+                            <i class="fa fa-plus"> Pertanyaan</i>
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPilihan">Pilihan</label>
+                        <select name="editPilihan" id="editPilihan" class="form-control select2bs4" required oninvalid="this.setCustomValidity('Silahkan isikan Pilihan')" oninput="this.setCustomValidity('')">
+                            <option value="">Pilih Pilihan</option>
+                            {% for item in masterpilihan %}
+                                <option value="{{ item.id }}">{{ item.name }} bobot {{ item.bobot }}</option>  <!-- Adjust the fields as necessary -->
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group text-right">
+                        <label for="addChoiceBtn"></label>
+                        <button type="button" class="btn btn-primary" onclick="openChoice(2)">
+                            <i class="fa fa-plus"> Pilihan</i>
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <label for="editBobot_pilihan">Bobot</label>
+                        <input type="number" class="form-control" id="editBobot_pilihan" name="editBobot_pilihan" required oninvalid="this.setCustomValidity('Silahkan isikan Bobot')" oninput="this.setCustomValidity('')">
+                    </div>
+                    <div class="form-group">
+                        <label for="editOrder">Urutan</label>
+                        <input type="number" class="form-control" id="editOrder" name="editOrder" required oninvalid="this.setCustomValidity('Silahkan isikan Urutan')" oninput="this.setCustomValidity('')">
+                    </div>
+                    <input type="hidden" id="editId">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
+                <button type="button" class="btn btn-primary" id="saveChanges">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Konfirmasi {{ title }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah anda ingin menghapus data {{ title }} ini?</p>
+                <input type="hidden" id="deleteId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">Hapus</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
+
+{% block js %}
+<!-- datatables -->
+<script src="{% static "adminlte/plugins/datatables/jquery.dataTables.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-responsive/js/dataTables.responsive.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-responsive/js/responsive.bootstrap4.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-buttons/js/dataTables.buttons.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-buttons/js/buttons.bootstrap4.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/jszip/jszip.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/pdfmake/pdfmake.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/pdfmake/vfs_fonts.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-buttons/js/buttons.html5.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-buttons/js/buttons.print.min.js" %}"></script>
+<script src="{% static "adminlte/plugins/datatables-buttons/js/buttons.colVis.min.js" %}"></script>
+
+<!-- Include SweetAlert2 CSS and JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+<!-- selet2 -->
+<script src="{% static "adminlte/plugins/select2/js/select2.full.min.js" %}"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+    function openQuestion(c){
+        $('#refModalQuestion').val(c);
+        let refModal = $('#refModalQuestion').val();
+        if(refModal == 1){
+            $('#addModal').modal('hide');
+        }else{
+            $('#editModal').modal('hide');
+        }
+        $('#addModalQuestion').modal({
+            backdrop: 'static',
+            keyboard: false,
+            show: true
+        });
+    }
+
+    function openChoice(c){
+        $('#refModalChoice').val(c);
+        let refModal = $('#refModalChoice').val();
+        if(refModal == 1){
+            $('#addModal').modal('hide');
+        }else{
+            $('#editModal').modal('hide');
+        }
+        $('#addModalChoice').modal({
+            backdrop: 'static',
+            keyboard: false,
+            show: true
+        });
+    }
+
+    $('#closeModalQuestion').click(function() {
+        $('#addModalQuestion').modal('hide');
+        let refModal = $('#refModalQuestion').val();
+        if(refModal == 1){
+            $('#addModal').modal('show');
+        }else{
+            $('#editModal').modal('show');
+        }
+    });
+
+    $('#closeModalChoice').click(function() {
+        $('#addModalChoice').modal('hide');
+        let refModal = $('#refModalChoice').val();
+        if(refModal == 1){
+            $('#addModal').modal('show');
+        }else{
+            $('#editModal').modal('show');
+        }
+    });
+</script>
+
+<script>
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+          if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+            // Only send the token to relative URLs i.e. locally.
+            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+          }
+        }
+      });
+      
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Check if this cookie string begins with the name we want
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+      
+</script>
+
+  <!-- Custome JS -->
+  <script>
+    $(document).on("keyup",".trim", function () {
+      if (this.value != this.value.replace(/\s/g, '')) {
+        this.value = this.value.replace(/\s/g, '');
+      }
+    });
+  </script>
+
+  <script>
+    // Function to format the date
+    function formatDate(dateString) {
+        // Parse the date string in ISO format
+        const date = new Date(dateString);
+
+        // Check for invalid date
+        if (isNaN(date.getTime())) return 'Invalid Date';
+
+        // Format the date into 'DD-MM-YYYY HH:mm'
+        const formattedDay = String(date.getDate()).padStart(2, '0');
+        const formattedMonth = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+        const formattedYear = date.getFullYear();
+        const formattedHours = String(date.getHours()).padStart(2, '0'); // Use getHours() for local time
+        const formattedMinutes = String(date.getMinutes()).padStart(2, '0');
+
+        return `${formattedDay}-${formattedMonth}-${formattedYear} ${formattedHours}:${formattedMinutes}`;
+    }
+
+    // Function to format the time
+    function formatTime(hours, minutes) {
+        const isPM = hours >= 12;
+        const formattedHours = hours % 12 || 12; // Convert to 12-hour format
+        const formattedMinutes = String(minutes).padStart(2, '0'); // Ensure two digits for minutes
+        return `${formattedHours}:${formattedMinutes} ${isPM ? 'PM' : 'AM'}`;
+    }
+
+    // Function to convert 12-hour time format to 24-hour format
+    function convertTo24HourFormat(time) {
+        const [timePart, modifier] = time.split(' ');
+        let [hours, minutes] = timePart.split(':');
+
+        if (modifier === 'PM' && hours !== '12') {
+            hours = String(Number(hours) + 12);
+        } else if (modifier === 'AM' && hours === '12') {
+            hours = '00';
+        }
+
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    }
+    
+    function refresh() {
+        let pengampu = 0;
+        let indikator = 0;
+        let level = 0;
+        let status = 0;
+    
+        $("#ListTable").DataTable({
+            'bDestroy': true,
+            'processing': true,
+            'ordering': true,
+            'scrollX': true,
+            'order': [],
+            'ajax': {
+                url: "{% url 'pilihan_data' %}?pengampu=" + pengampu + "&indikator=" + indikator + "&level=" + level + "&status=" + status,
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken') // Include CSRF token here
+                },
+            },
+            'columns': [
+                { data: 'no', title: 'No', className: "text-center" },  // Incremental number
+                { data: 'id', title: 'ID', className: "text-center", visible: false },   // ID Column
+                { data: 'pertanyaan__name', title: 'Pertanyaan', className: "text-left" }, // Name Column
+                { data: 'master_pilihan_id__name', title: 'Pilihan', className: "text-left" }, // Name Column
+                { data: 'bobot', title: 'Bobot', className: "text-left" }, // Name Column
+                { data: 'order', title: 'Urutan', className: "text-left" }, // Name Column
+                { 
+                    data: null,
+                    title: '#',
+                    className: "text-center",
+                    render: function(data, type, row) {
+                        // Check if deleted_at is not null
+                        const deleteButton = row.deleted_at ? '' : `
+                            <button class="btn btn-danger btn-delete" data-id="${row.id}"><i class="fa fa-times"></i></button>
+                        `;
+                        const deactivateButton = row.is_active ? `
+                            <button class="btn btn-warning btn-deactivate" data-id="${row.id}"><i class="fa fa-ban"></i></button>
+                        ` : `<button class="btn btn-warning btn-activate" data-id="${row.id}"><i class="fa fa-check"></i></button>`;
+                        return `
+                            <button class="btn btn-info btn-edit" data-id="${row.id}" data-pertanyaan="${row.pertanyaan_id}" data-pilihan="${row.master_pilihan_id}" data-bobot="${row.bobot}" data-order="${row.order}" data-category="${row.pertanyaan__category}"><i class="fa fa-edit"></i></button>
+                            ${deleteButton}
+                        `;
+                    }
+                }
+            ],
+            'language': {
+                'emptyTable': 'Data tidak tersedia',
+                'info': 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
+                'infoEmpty': 'Menampilkan 0 sampai 0 dari 0 data',
+                'infoFiltered': '(sorting dari _MAX_ total data)',
+                'lengthMenu': 'Menampilkan _MENU_ data',
+                'zeroRecords': 'Ooops,.. Maaf data yang anda cari tidak ada',
+                'search': 'Pencarian : ',
+                'paginate': {
+                    'first': 'Awal',
+                    'last': 'Akhir',
+                    'next': 'Berikutnya',
+                    'previous': 'Sebelumnya'
+                }
+            },
+            'dom': 'Bfrtip', // Menambahkan posisi untuk button
+            'buttons': [
+                {
+                    extend: 'copyHtml5',
+                    text: '<i class="fa fa-copy"></i> Salin',
+                    titleAttr: 'Salin',
+                    className: 'btn btn-secondary'
+                },
+                {
+                    extend: 'excelHtml5',
+                    text: '<i class="fa fa-file-excel"></i> Excel',
+                    titleAttr: 'Ekspor ke Excel',
+                    className: 'btn btn-success'
+                },
+                {
+                    extend: 'csvHtml5',
+                    text: '<i class="fa fa-file-csv"></i> CSV',
+                    titleAttr: 'Ekspor ke CSV',
+                    className: 'btn btn-info'
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: '<i class="fa fa-file-pdf"></i> PDF',
+                    titleAttr: 'Ekspor ke PDF',
+                    className: 'btn btn-danger'
+                },
+                {
+                    extend: 'print',
+                    text: '<i class="fa fa-print"></i> Print',
+                    titleAttr: 'Print',
+                    className: 'btn btn-warning'
+                }
+            ]
+        });        
+    
+        // Event delegation for edit button
+        $('#ListTable tbody').on('click', '.btn-edit', function() {
+            const id = $(this).data('id');
+            const category = $(this).data('category');
+            const pertanyaan = $(this).data('pertanyaan');
+            const pilihan = $(this).data('pilihan');
+            const bobot = $(this).data('bobot');
+            const order = $(this).data('order');
+
+            // Populate modal fields with current data
+            $('#editCategory_pertanyaan').val(category).trigger('change');
+            $('#editPertanyaan').val(pertanyaan).trigger('change');
+            $('#editPilihan').val(pilihan).trigger('change');
+            $('#editBobot_pilihan').val(bobot);
+            $('#editOrder').val(order);
+            $('#editId').val(id);
+            
+            // Show the modal
+            $('#editModal').modal('show');
+
+            // Check if the input gets focused
+            $('#editName').focus();  // Focus on the input
+        });
+
+        // Save changes button in the modal
+        $('#saveChanges').on('click', function() {
+            const id = $('#editId').val();
+            const newCategory = $('#editCategory_pertanyaan').val();
+            const newPertanyaan = $('#editPertanyaan').val();
+            const newPilihan = $('#editPilihan').val();
+            const newBobot = $('#editBobot_pilihan').val();
+            const newOrder = $('#editOrder').val();
+
+            $.ajax({
+                url: "{% url 'pilihan_data' %}",
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                data: {
+                    action: 'edit',
+                    id: id,
+                    category: newCategory,
+                    pertanyaan: newPertanyaan,
+                    pilihan: newPilihan,
+                    bobot: newBobot,
+                    order: newOrder,
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#ListTable').DataTable().ajax.reload(); // Refresh the table
+                        $('#editModal').modal('hide'); // Hide the modal
+                        Swal.fire(
+                            'Ubah Data!',
+                            'Data berhasil diubah.',
+                            'success'
+                        );
+                    } else {
+                        //alert("Data gagal diubah.");
+                        Swal.fire('Error!', 'Data gagal diubah.', 'error');
+                    }
+                },
+                error: function() {
+                    //alert("Data gagal diubah.");
+                    Swal.fire('Error!', 'Data gagal diubah.', 'error');
+                }
+            });
+        });
+
+    
+        // Event delegation for delete button
+        $('#ListTable tbody').on('click', '.btn-delete', function() {
+            const id = $(this).data('id');
+
+            // Store the ID in the hidden input field
+            $('#deleteId').val(id);
+            
+            // Show the delete confirmation modal
+            $('#deleteModal').modal('show');
+        });
+
+        // Confirm delete button in the modal
+        $('#confirmDelete').on('click', function() {
+            const id = $('#deleteId').val();
+
+            $.ajax({
+                url: "{% url 'pilihan_data' %}",
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                data: {
+                    action: 'delete',
+                    id: id
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#ListTable').DataTable().ajax.reload(); // Refresh the table
+                        $('#deleteModal').modal('hide'); // Hide the modal
+                        Swal.fire(
+                            'Hapus Data!',
+                            'Data berhasul dihapus.',
+                            'success'
+                        );
+                    } else {
+                        //alert("An error occurred while deleting.");
+                        Swal.fire('Error!', 'Data gagal dihapus.', 'error');
+                    }
+                },
+                error: function() {
+                    //alert("An error occurred while deleting.");
+                    Swal.fire('Error!', 'Data gagal dihapus.', 'error');
+                }
+            });
+        });
+    
+        $('body').css('padding-right', '0');
+    }      
+
+    $(function () {
+      refresh();
+      //Initialize Select2 Elements
+      $('.select2').select2();
+
+      //Initialize Select2 Elements
+      $('.select2bs4').select2({
+        theme: 'bootstrap4'
+      });
+
+      $('#pilihan').select2({
+        theme: 'bootstrap4',
+        ajax: {
+            url: '{% url "masterpilihan_data" %}',
+            type: 'POST', // Use POST method
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            dataType: 'json',
+            delay: 250,
+    
+            // Function to handle the request parameters
+            data: function(params) {
+                return {
+                    action: 'select', // Corrected the key from 'acction' to 'action'
+                    q: params.term,   // Include the search term
+                };
+            },
+    
+            processResults: function(data) {
+                return {
+                    results: data.results // Ensure this matches the format of your response
+                };
+            }
+        },
+        //minimumInputLength: 1, // Minimum characters before triggering AJAX
+        placeholder: 'Pilih Pilihan',
+        allowClear: true // Allow clearing of the selection
+    });
+    });
+
+    $(document).ready(function() {
+        // Handle the form submission
+        $('#addForm').on('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+    
+            const name = $('#name').val();
+            const bobot = $('#bobot_pilihan').val();
+            const order = $('#order').val();
+            const pilihan = $('#pilihan').val();
+            const pertanyaan = $('#pertanyaan').val();
+
+            console.log(bobot);
+    
+            $.ajax({
+                url: "{% url 'pilihan_data' %}",
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                data: {
+                    action: 'add',
+                    name: name,
+                    bobot: bobot,
+                    order: order,
+                    pilihan: pilihan,
+                    pertanyaan: pertanyaan,
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#addModal').modal('hide'); // Hide the modal
+                        $('#ListTable').DataTable().ajax.reload(); // Refresh the table
+                        Swal.fire(
+                            'Tambah Data!',
+                            'Data berhasil ditambahkan.',
+                            'success'
+                        );
+                    }else{
+                        Swal.fire(
+                            'Error!',
+                            response.message,
+                            'error'
+                        );
+                    }
+                },
+                error: function() {
+                    Swal.fire(
+                        'Error!',
+                        'Data gagal ditambahkan.',
+                        'error'
+                    );
+                }
+            });
+        });
+    });
+
+    $(document).on('click', '.btn-deactivate', function() {
+        const userId = $(this).data('id');
+    
+        // Confirm deactivation action
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: "Anda yakin ingin menonaktifkan {{ title }} ini?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, nonaktifkan!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // AJAX call to deactivate user
+                $.ajax({
+                    url: '{% url 'pilihan_data' %}',  // Update to your URL
+                    type: 'POST',
+                    data: {
+                        action: 'deactive',
+                        id: userId,
+                        active: false,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'  // Include CSRF token if needed
+                    },
+                    success: function(response) {
+                        Swal.fire('Berhasil!', '{{ title }} telah dinonaktifkan.', 'success');
+                        // Optionally, reload the DataTable to reflect changes
+                        $('#ListTable').DataTable().ajax.reload();
+                    },
+                    error: function(xhr) {
+                        Swal.fire('Gagal!', 'Terjadi kesalahan: ' + xhr.responseText, 'error');
+                    }
+                });
+            }
+        });
+    });
+
+    $(document).on('click', '.btn-activate', function() {
+        const userId = $(this).data('id');
+    
+        // Confirm deactivation action
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: "Anda yakin ingin mengaktifkan {{ title }} ini?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, aktifkan!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '{% url 'pilihan_data' %}',  // Update to your URL
+                    type: 'POST',
+                    data: {
+                        action: 'active',
+                        id: userId,
+                        active: true,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'  // Include CSRF token if needed
+                    },
+                    success: function(response) {
+                        Swal.fire('Berhasil!', '{{ title }} telah diaktifkan.', 'success');
+                        // Optionally, reload the DataTable to reflect changes
+                        $('#ListTable').DataTable().ajax.reload();
+                    },
+                    error: function(xhr) {
+                        Swal.fire('Gagal!', 'Terjadi kesalahan: ' + xhr.responseText, 'error');
+                    }
+                });
+            }
+        });
+    });
+
+    $(document).ready(function() {
+        // Handle the form submission
+        $('#addFormQuestion').on('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+            
+            const formData = new FormData(this); // Create a FormData object from the form
+    
+            // Append the action field to the FormData
+            formData.append('action', 'add');
+    
+            $.ajax({
+                url: "{% url 'pertanyaan_data' %}",
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                data: formData,
+                processData: false, // Tell jQuery not to process the data
+                contentType: false, // Tell jQuery not to set contentType
+                success: function(response) {
+                    if (response.success) {
+                        refresh();
+                        $('#addModalQuestion').modal('hide');
+                        $('#addModal').modal('show');
+                        $('#ListTable').DataTable().ajax.reload(); // Refresh the table
+                        Swal.fire(
+                            'Tambah Data!',
+                            'Data berhasil ditambahkan.',
+                            'success'
+                        );
+                    } else {
+                        Swal.fire(
+                            'Error!',
+                            response.message,
+                            'error'
+                        );
+                    }
+                },
+                error: function() {
+                    Swal.fire(
+                        'Error!',
+                        'Data gagal ditambahkan.',
+                        'error'
+                    );
+                }
+            });
+        });
+    }); 
+
+    $(document).ready(function() {
+        // Handle the form submission
+        $('#addFormChoice').on('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+            
+            const formData = new FormData(this); // Create a FormData object from the form
+    
+            // Append the action field to the FormData
+            formData.append('action', 'add');
+    
+            $.ajax({
+                url: "{% url 'masterpilihan_data' %}",
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        $('#addModalChoice').modal('hide');
+                        console.log(1);
+                        $('#pilihan').select2({
+                            theme: 'bootstrap4',
+                            ajax: {
+                                url: '{% url "masterpilihan_data" %}',
+                                type: 'POST', // Use POST method
+                                headers: {
+                                    'X-CSRFToken': getCookie('csrftoken')
+                                },
+                                dataType: 'json',
+                                delay: 250,
+                        
+                                // Function to handle the request parameters
+                                data: function(params) {
+                                    return {
+                                        action: 'select', // Corrected the key from 'acction' to 'action'
+                                        q: params.term,   // Include the search term
+                                    };
+                                },
+                        
+                                processResults: function(data) {
+                                    return {
+                                        results: data.results // Ensure this matches the format of your response
+                                    };
+                                }
+                            },
+                            //minimumInputLength: 1, // Minimum characters before triggering AJAX
+                            placeholder: 'Pilih Pilihan',
+                            allowClear: true // Allow clearing of the selection
+                        });                        
+                        $('#addModal').modal('show');
+                        $('#ListTable').DataTable().ajax.reload(); // Refresh the table
+                        Swal.fire(
+                            'Tambah Data!',
+                            'Data berhasil ditambahkan.',
+                            'success'
+                        );
+                    } else {
+                        Swal.fire(
+                            'Error!',
+                            response.message,
+                            'error'
+                        );
+                    }
+                },
+                error: function() {
+                    Swal.fire(
+                        'Error!',
+                        'Data gagal ditambahkan.',
+                        'error'
+                    );
+                }
+            });
+        });
+    }); 
+
+    $(document).ready(function() {
+        // Handle the form submission
+        $('#pilihan').on('change', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+    
+            // Ambil nilai dari dropdown
+            const masterpilihanId = $(this).val(); // Gunakan 'this' untuk mendapatkan nilai saat ini
+    
+            $.ajax({
+                url: "{% url 'masterpilihan_data' %}?masterpilihan_id=" + masterpilihanId, // Menggunakan nilai yang benar
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#bobot_pilihan').val(response.data[0].bobot); // Menggunakan jQuery untuk mengatur nilai
+                    } else {
+                        Swal.fire(
+                            'Error!',
+                            response.message,
+                            'error'
+                        );
+                    }
+                },
+                error: function() {
+                    Swal.fire(
+                        'Error!',
+                        'Data gagal ditambahkan.',
+                        'error'
+                    );
+                }
+            });
+        });
+    });    
+
+    $(document).ready(function() {
+        // Handle the form submission
+        $('#editPilihan').on('change', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+    
+            // Ambil nilai dari dropdown
+            const masterpilihanId = $(this).val(); // Gunakan 'this' untuk mendapatkan nilai saat ini
+    
+            $.ajax({
+                url: "{% url 'masterpilihan_data' %}?masterpilihan_id=" + masterpilihanId, // Menggunakan nilai yang benar
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#editBobot_pilihan').val(response.data[0].bobot); // Menggunakan jQuery untuk mengatur nilai
+                    } else {
+                        Swal.fire(
+                            'Error!',
+                            response.message,
+                            'error'
+                        );
+                    }
+                },
+                error: function() {
+                    Swal.fire(
+                        'Error!',
+                        'Data gagal ditambahkan.',
+                        'error'
+                    );
+                }
+            });
+        });
+    });    
+
+    $(document).ready(function() {
+        // Handle the form submission
+        $('#category_pertanyaan').on('change', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+    
+            // Ambil nilai dari dropdown
+            const category_pertanyaan = $(this).val(); // Gunakan 'this' untuk mendapatkan nilai saat ini
+            
+            if(category_pertanyaan !== ""){
+                $.ajax({
+                    url: "{% url 'pertanyaan_data' %}?category_pertanyaan=" + category_pertanyaan, // Menggunakan nilai yang benar
+                    type: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Kosongkan dropdown lama
+                            $('#pertanyaan').empty();
+        
+                            // Tambahkan opsi baru dari respons
+                            $.each(response.data, function(index, item) {
+                                $('#pertanyaan').append(new Option(item.name, item.id));
+                            });
+        
+                            // Memperbarui Select2
+                            $('#pertanyaan').select2({
+                                theme: 'bootstrap4'
+                            });
+                        } else {
+                            Swal.fire(
+                                'Error!',
+                                response.message,
+                                'error'
+                            );
+                        }
+                    },
+                    error: function() {
+                        Swal.fire(
+                            'Error!',
+                            'Data gagal ditambahkan.',
+                            'error'
+                        );
+                    }
+                });
+            }else{
+                $('#pertanyaan').empty();
+            }
+        });
+    });
+    
+    $(document).ready(function() {
+        // Handle the form submission
+        $('#editCategory_pertanyaan').on('change', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+    
+            // Ambil nilai dari dropdown
+            const category_pertanyaan = $(this).val(); // Gunakan 'this' untuk mendapatkan nilai saat ini
+    
+            $.ajax({
+                url: "{% url 'pertanyaan_data' %}?category_pertanyaan=" + category_pertanyaan, // Menggunakan nilai yang benar
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Kosongkan dropdown lama
+                        $('#editPertanyaan').empty();
+    
+                        // Tambahkan opsi baru dari respons
+                        $.each(response.data, function(index, item) {
+                            $('#editPertanyaan').append(new Option(item.name, item.id));
+                        });
+    
+                        // Memperbarui Select2
+                        $('#editPertanyaan').select2({
+                            theme: 'bootstrap4'
+                        });
+                    } else {
+                        Swal.fire(
+                            'Error!',
+                            response.message,
+                            'error'
+                        );
+                    }
+                },
+                error: function() {
+                    Swal.fire(
+                        'Error!',
+                        'Data gagal ditambahkan.',
+                        'error'
+                    );
+                }
+            });
+        });
+    });
+    
+  </script>
+  <!-- Custome JS -->
+{% endblock  %}
