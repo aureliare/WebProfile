@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 from .views import UserLoginView, LogoutView
 
@@ -9,6 +9,17 @@ urlpatterns = [
     path('password_reset/', views.PasswordResetRequestView.as_view(), name='password_reset'),
     path('password_reset/confirm/<uidb64>/<token>/', views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('password_reset/confirm/', views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+
+    path('webprofile/', views.webprofile_view, name='webprofile'),
+
+    # URL untuk halaman utama
+    path('', views.home_view, name='home'),
+
+
+    # URL untuk halaman profile dropdown
+    path('profile-pejabat/', views.profile_pejabat_view, name='profile_pejabat'),
+    path('tugas-pokok-fungsi/', views.tugas_pokok_fungsi_view, name='tugas_pokok_fungsi'),
+    path('struktur-organisasi/', views.struktur_organisasi_view, name='struktur_organisasi'),
 
 
     path('admin/dashboard/', views.AdminDashboardView.as_view(), name='admin_dashboard'),

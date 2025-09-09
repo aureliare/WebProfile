@@ -1,3 +1,5 @@
+# myapp/views.py
+from django.shortcuts import render
 from django.views import View
 from .models import (
     Instansi, User, Klaster, Indikator,
@@ -57,6 +59,25 @@ def is_user(user):
 
 def is_operator(user):
     return hasattr(user, 'role') and user.role == 'operator'  # Memeriksa role
+
+def webprofile_view(request):
+    # Logika atau data yang ingin Anda kirim ke template bisa ditaruh di sini
+    context = {}
+    return render(request, 'webprofile/webprofile.html', context)
+
+# Halaman utama
+def home_view(request):
+    return render(request, 'webprofile/webprofile.html')
+
+# Views untuk halaman profile dropdown
+def profile_pejabat_view(request):
+    return render(request, 'profile/profile_pejabat.html')
+
+def tugas_pokok_fungsi_view(request):
+    return render(request, 'profile/tugas_pokok_fungsi.html')
+
+def struktur_organisasi_view(request):
+    return render(request, 'profile/struktur_organisasi.html')
 
 class UserRegisterView(View):
     def get(self, request):
