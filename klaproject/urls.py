@@ -23,6 +23,8 @@ urlpatterns = [
     path('superuser/', admin.site.urls),
     path('kla/', include('myapp.urls')),  # Ganti 'myapp' dengan nama aplikasi Anda
     path('captcha/', include('captcha.urls')),
+    path('webprofile/', include('myapp.urls')),
+
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
