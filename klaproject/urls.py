@@ -24,6 +24,9 @@ urlpatterns = [
     path('kla/', include('myapp.urls')),  # Ganti 'myapp' dengan nama aplikasi Anda
     path('captcha/', include('captcha.urls')),
     path('webprofile/', include('myapp.urls')),
+    path('profile-pejabat/', include('myapp.urls')),
+    path('tugas-pokok-fungsi/', include('myapp.urls')),
+    path('struktur-organisasi/', include('myapp.urls')),
 
 ]
 
