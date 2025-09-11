@@ -1,0 +1,76 @@
+/* myapp/static/css/custom.css */
+
+.custom-footer {
+    background-color: #025C91; /* Warna latar belakang gelap kebiruan */
+    color: #ecf0f1;           /* Warna teks terang */
+    padding: 50px 0 0 0;
+    font-size: 14px;
+}
+
+.custom-footer .custom-footer2 {
+    background-color: #1C9647;
+    padding-bottom: 8px; 
+    text-align: center;
+}
+
+.custom-footer .footer-logo {
+    max-width: 80px;
+    margin-bottom: 15px;
+}
+
+.custom-footer h5 {
+    color: #ffffff;
+    text-transform: uppercase;
+    font-size: 16px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3498db; /* Garis bawah biru pada judul */
+    display: inline-block;
+}
+
+.custom-footer p {
+    line-height: 1.8;
+}
+
+.custom-footer .contact-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.address-item h3{
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.custom-footer .contact-item i {
+    font-size: 18px;
+    width: 30px; /* Memberi ruang agar teks tidak menempel */
+    text-align: center;
+    display: flex;
+}
+
+.custom-footer .contact-item a {
+    color: #ecf0f1; /* Warna link */
+    text-decoration: none;
+}
+
+.custom-footer .contact-item a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+/* Sedikit penyesuaian untuk tampilan mobile */
+@media (max-width: 768px) {
+    .custom-footer .footer-col {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .custom-footer .contact-item {
+        justify-content: center;
+    }
+}
